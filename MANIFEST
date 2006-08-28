@@ -1,0 +1,16 @@
+Makefile.PL
+Changes
+MANIFEST
+#META.yml # Will be created by "make dist"
+README
+private.c
+lib/Text/Bidi.pm
+lib/Text/Bidi/mirrored.pm
+lib/Text/Bidi/CapRTL.pm
+lib/Text/Bidi/private.pm
+swig/fribidi.i
+t/00-load.t
+t/pod.t
+t/CapRTL_implicit.t
+t/CapRTL_explicit.t
+META.yml                                 Module meta-data (added by MakeMaker)
