@@ -12,10 +12,10 @@
  * same parameter specifies the length of several arrays. We deal with it in 
  * the following way (adapted from list-vector.i in the guile part of the 
  * swig distribution):
- * The length is an ignore argument (numinputs=0), whose translation thus 
+ * The length is an "ignore" argument (numinputs=0), whose translation thus 
  * appears near the beginning. We allocate a (function-) global variable to 
  * hold the value in its typemap. The input string is then dealt with using a 
- * usual in typemap, which assigns values both to the string and to the 
+ * usual "in" typemap, which assigns values both to the string and to the 
  * global variable representing the length. Finally, the output string are 
  * allocated in a check typemap, which guarantees that the length is already 
  * initialised.
@@ -43,11 +43,7 @@
 
 %typemap(argout) FriBidiCharType *pbase_dirs %{
   if (_global_wantarray) {
-    if (argvi >= items) {
-      EXTEND(sp,1);
-    }
-    $result = sv_newmortal();
-    sv_setiv($result,(IV) *($1));
+    mXPUSHu(*($1));
     argvi++;
   }
 %}
@@ -78,22 +74,17 @@
 %}
 
 %typemap(check,noblock=1) FriBidiChar* visual_str {
-  *temp$argnum = %static_cast(
-      malloc(sizeof($*1_ltype) * ((*_global_p_len) + 1)),
-      $1_ltype);
+  Newx(*temp$argnum, ((*_global_p_len) + 1), $*1_ltype);
 }
 
 %typemap(argout) FriBidiChar* visual_str %{
-  if (argvi >= items) {
-    EXTEND(sp,1);              /* Extend the stack by 1 object */
-  }
-  $result = sv_2mortal(newSVpvn((const char *)($1), 
-                       (STRLEN)( (*_global_p_len) * sizeof($*1_ltype))));
+  mXPUSHp((const char *)($1), 
+          (STRLEN)( (*_global_p_len) * sizeof($*1_ltype)));
   argvi++;
 %}
 
 %typemap(freearg) FriBidiChar* visual_str %{
-  if ($1) free($1);
+  if ($1) Safefree($1);
 %}
 
 /* same,but where the output argument is optional, depending on the context 
@@ -109,8 +100,7 @@
 
   %typemap(check,noblock=1) Type* NEWOPT {
     if ( Check ) {
-      *temp$argnum = %static_cast(
-          malloc(sizeof($*1_ltype) * ((*_global_p_len) + 1)), $1_ltype);
+      Newx(*temp$argnum, ((*_global_p_len) + 1), $*1_ltype);
     }
   }
 
@@ -118,18 +108,15 @@
     if ( Check ) {
       AV* tempav = newAV();
       int i;
-      if (argvi >= items) {
-        EXTEND(sp,1);              /* Extend the stack by 1 object */
-      }
       for(i=0 ; i < (*_global_p_len) ; i++)
         av_push(tempav, newSVuv($1[i]));
-      $result = sv_2mortal(newRV_noinc((SV *) tempav));
+      XPUSHs(sv_2mortal(newRV_noinc((SV *) tempav)));
       argvi++;
     }
   %}
 
   %typemap(freearg) Type* NEWOPT %{
-    if ($1) free($1);
+    if ($1) Safefree($1);
   %}
 %enddef
     
@@ -173,11 +160,8 @@ fribidi_log2vis_get_embedding_levels (	/* input */
 
 %apply FriBidiChar* str { FriBidiChar *inout }
 %typemap(argout) FriBidiChar* inout %{
-  if (argvi >= items) {
-    EXTEND(sp,1);              /* Extend the stack by 1 object */
-  }
-  $result = sv_2mortal(newSVpvn((const char *)($1), 
-                       (STRLEN)( (result) * sizeof($*1_ltype))));
+  mXPUSHp((const char *)($1), 
+          (STRLEN)( (result) * sizeof($*1_ltype)));
   argvi++;
 %}
 
@@ -191,9 +175,14 @@ fribidi_log2vis_get_embedding_levels (	/* input */
     size_t i;
     buf = (AV*)(SvRV($input));
     size = av_len(buf) + 1;
-    $1 = %static_cast(malloc(size * sizeof($*1_ltype)), $1_ltype);
-    for(i=0;i < size; i++)
-      $1[i] = %numeric_cast(SvUV(*(av_fetch(buf, i, 0))), $*1_ltype);
+    Newx($1, size, $*1_ltype);
+    for(i=0;i < size; i++) {
+      SV** sv = av_fetch(buf, i, 0);
+      if ( sv )
+        $1[i] = %numeric_cast(SvUV(*sv), $*1_ltype);
+      else
+        $1[i] = -1;
+    }
   }
 }
 
@@ -201,14 +190,15 @@ fribidi_log2vis_get_embedding_levels (	/* input */
   if ( $1 ) {
     AV* tempav = newAV();
     int i;
-    if (argvi >= items) {
-      EXTEND(sp,1);              /* Extend the stack by 1 object */
-    }
     for(i=0 ; i < result ; i++)
       av_push(tempav, newSVuv($1[i]));
-    $result = sv_2mortal(newRV_noinc((SV *) tempav));
+    XPUSHs(sv_2mortal(newRV_noinc((SV *) tempav)));
     argvi++;
   }
+%}
+
+%typemap(freearg) FriBidiStrIndex *position_from_this_list %{
+  if ($1) Safefree($1);
 %}
 
 FRIBIDI_API FriBidiStrIndex
@@ -240,17 +230,12 @@ FRIBIDI_API void fribidi_set_reorder_nsm (fribidi_boolean);
 
 /* the size of the output string may grow because of control seqs. */
 %typemap(check,noblock=1) char* out {
-  *temp$argnum = %static_cast(
-      malloc(2 * sizeof($*1_ltype) * ((*_global_p_len) + 1)),
-      $1_ltype);
+  Newx(*temp$argnum, 2*((*_global_p_len) + 1), $*1_ltype);
 }
 
 %typemap(argout) char* out, FriBidiChar* out %{
-  if (argvi >= items) {
-    EXTEND(sp,1);              /* Extend the stack by 1 object */
-  }
-  $result = sv_2mortal(newSVpvn((char *)($1), 
-                       (STRLEN)( (result) * sizeof($*1_ltype))));
+  mXPUSHp((char *)($1), 
+          (STRLEN)( (result) * sizeof($*1_ltype)));
   argvi++;
 %}
 
@@ -264,5 +249,5 @@ int fribidi_unicode_to_cap_rtl (FriBidiChar *str, FriBidiStrIndex len,
                           char *out);
 
 
-/* vim: set fo-=t comments-=:% cindent sw=2: */
+/* vim: fo-=t comments-=:% cindent sw=2: */
 

@@ -5,6 +5,7 @@ WriteMakefile(
     ABSTRACT_FROM => 'lib/Text/Bidi.pm',
     DISTNAME => 'Text-Bidi',
     LIBS => '-lfribidi',
+    OPTIMIZE => '-ggdb3',
     OBJECT => 'private.o',
 );
 

@@ -12,7 +12,7 @@ Text::Bidi - Unicode bidi algorithm using libfribidi
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 use Encode;
@@ -91,7 +91,7 @@ BEGIN {
         ) ],
     );
     our @EXPORT_OK = ( @{$EXPORT_TAGS{'all'}} );
-    our @EXPORT = qw();
+    our @EXPORT = qw(); ## no critic
 }
 
 =head1 Description
@@ -145,7 +145,7 @@ our $GlobalClass = __PACKAGE__;
 sub S(\@) {
     my $l = shift;
     my $s = $l->[0];
-    return shift @$l if ( ref $s and UNIVERSAL::isa($s, 'Text::Bidi') );
+    return shift @$l if eval { $s->isa('Text::Bidi') };
     $Global = new $GlobalClass unless $Global;
     $Global
 }
@@ -185,7 +185,7 @@ foreach ( keys %Text::Bidi::private:: ) {
         if /^FRIBIDI_TYPE_([A-Z]*)$/;
     *{"Text::Bidi::Mask::$1"} = *{"Text::Bidi::private::$_"} 
         if /^FRIBIDI_MASK_([A-Z]*)$/;
-    no warnings;
+    no warnings 'once'; ## no critic
     ${"Text::Bidi::Unicode::$1"} = chr(${"Text::Bidi::private::$_"})
         if /^UNI_([A-Z]*)$/;
 }
@@ -330,9 +330,9 @@ Pure left-to-right text has embedding level 0. A character is left-to-right
 sub log2vis {
     my $self = S(@_);
     my $str = shift;
-    my $width = $#_ ? pop : $self->get_width;
+    my $width = exists $_[1] ? pop : $self->get_width;
     my $wa = wantarray;
-    my $in = encode("UTF-32LE", $str);
+    my $in = encode('UTF-32LE', $str);
     my ($res, $Dir, $L2v, $V2l, $Levels);
     if ( $width and $width < length($str) ) {
         # log2vis doesn't take the display width into account, so we have to 
@@ -354,7 +354,7 @@ sub log2vis {
             $res .= $vis;
             $i += $width;
         }
-        $res = encode("UTF-32LE", $res) if $self->get_clean;
+        $res = encode('UTF-32LE', $res) if $self->get_clean;
     } else {
         # no width required - may use log2vis from fribidi
         if ($wa) {
@@ -363,12 +363,12 @@ sub log2vis {
         } else {
             $res = Text::Bidi::private::log2vis($in, @_);
         }
-        $res = decode("UTF-32LE", $res) unless $self->get_clean;
+        $res = decode('UTF-32LE', $res) unless $self->get_clean;
     }
     if ( $self->get_clean ) {
         ($res, $V2l) = 
             Text::Bidi::private::fribidi_remove_bidi_marks($res, $V2l);
-        $res = decode("UTF-32LE", $res); 
+        $res = decode('UTF-32LE', $res); 
         if ($V2l) {
             $L2v = $self->invert($V2l);
         }
@@ -529,7 +529,7 @@ for a description of the translation table.
 
 sub caprtl_to_unicode {
     Text::Bidi::private::fribidi_char_set_enter_cap_rtl();
-    decode("UTF-32LE", Text::Bidi::private::fribidi_cap_rtl_to_unicode(@_))
+    decode('UTF-32LE', Text::Bidi::private::fribidi_cap_rtl_to_unicode(@_))
 }
 
 =head3 unicode_to_caprtl()
@@ -540,7 +540,7 @@ Perform the inverse of L</caprtl_to_unicode()>
 
 sub unicode_to_caprtl {
     Text::Bidi::private::fribidi_char_set_enter_cap_rtl();
-    Text::Bidi::private::fribidi_unicode_to_cap_rtl(encode("UTF-32LE", shift));
+    Text::Bidi::private::fribidi_unicode_to_cap_rtl(encode('UTF-32LE', shift));
 }
 
 =head1 Comparison with libfribidi and FriBidi.pm

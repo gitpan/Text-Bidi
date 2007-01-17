@@ -1,5 +1,11 @@
 Revision history for Text-Bidi
 
+0.02    17.01.2007
+        * Fixed memory leak in remove_bidi_marks when called with two 
+          arguments
+        * Fixed bug when calling log2vis with 2 arguments
+        * Changed the typemaps to use more perlapi macros (XPUSH, etc.)
+
 0.01    28.08.2006
         First version
 
