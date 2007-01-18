@@ -1451,6 +1451,9 @@ SWIGEXPORT void SWIG_init (CV *cv, CPerlObj *);
 #endif
 
 
+#ifndef Newx
+#define Newx(A,B,C) New(42,A,B,C)
+#endif
 #include <fribidi/fribidi.h>
 FRIBIDI_API void log2vis ( /* input */
                            FriBidiChar *str,
@@ -1860,47 +1863,85 @@ XS(_wrap_log2vis) {
     _saved[0] = ST(1);
     log2vis(arg1,arg2,arg3,arg4,arg5,arg6,arg7);
     
-    
-    mXPUSHp((const char *)(arg3), 
-      (STRLEN)( (*_global_p_len) * sizeof(FriBidiChar)));
-    argvi++;
-    
-    
-    if (_global_wantarray) {
-      mXPUSHu(*(arg4));
-      argvi++;
+    {
+      /*@SWIG:MXPUSHP@*/
+      /*@SWIG:XPUSHS@*/
+      if (argvi >= items)
+      EXTEND(sp, 1);
+      ST(argvi) = sv_2mortal(newSVpvn((const char *)(arg3),(STRLEN)( (*_global_p_len) * sizeof(FriBidiChar))));
+      argvi++
+      /*@SWIG@*/
+      /*@SWIG@*/;
     }
-    
-    
-    if ( _global_wantarray ) {
-      AV* tempav = newAV();
-      int i;
-      for(i=0 ; i < (*_global_p_len) ; i++)
-      av_push(tempav, newSVuv(arg5[i]));
-      XPUSHs(sv_2mortal(newRV_noinc((SV *) tempav)));
-      argvi++;
+    {
+      if (_global_wantarray) {
+        /*@SWIG:MXPUSHU@*/
+        /*@SWIG:XPUSHS@*/
+        if (argvi >= items)
+        EXTEND(sp, 1);
+        ST(argvi) = sv_2mortal(newSVuv(*(arg4)));
+        argvi++
+        /*@SWIG@*/
+        /*@SWIG@*/;
+      }
     }
-    
-    
-    if ( _global_wantarray ) {
-      AV* tempav = newAV();
-      int i;
-      for(i=0 ; i < (*_global_p_len) ; i++)
-      av_push(tempav, newSVuv(arg6[i]));
-      XPUSHs(sv_2mortal(newRV_noinc((SV *) tempav)));
-      argvi++;
+    {
+      if ( _global_wantarray )
+      /*@SWIG:MXPUSHUA@*/
+      {
+        AV* tempav = newAV();
+        int i;
+        for(i=0 ; i < (*_global_p_len) ; i++)
+        av_push(tempav, newSVuv(arg5[i]));
+        /*@SWIG:MXPUSHR@*/
+        /*@SWIG:XPUSHS@*/
+        if (argvi >= items)
+        EXTEND(sp, 1);
+        ST(argvi) = sv_2mortal(newRV_noinc((SV *)tempav));
+        argvi++
+        /*@SWIG@*/
+        /*@SWIG@*/;
+      }
+      /*@SWIG@*/;
     }
-    
-    
-    if ( _global_wantarray ) {
-      AV* tempav = newAV();
-      int i;
-      for(i=0 ; i < (*_global_p_len) ; i++)
-      av_push(tempav, newSVuv(arg7[i]));
-      XPUSHs(sv_2mortal(newRV_noinc((SV *) tempav)));
-      argvi++;
+    {
+      if ( _global_wantarray )
+      /*@SWIG:MXPUSHUA@*/
+      {
+        AV* tempav = newAV();
+        int i;
+        for(i=0 ; i < (*_global_p_len) ; i++)
+        av_push(tempav, newSVuv(arg6[i]));
+        /*@SWIG:MXPUSHR@*/
+        /*@SWIG:XPUSHS@*/
+        if (argvi >= items)
+        EXTEND(sp, 1);
+        ST(argvi) = sv_2mortal(newRV_noinc((SV *)tempav));
+        argvi++
+        /*@SWIG@*/
+        /*@SWIG@*/;
+      }
+      /*@SWIG@*/;
     }
-    
+    {
+      if ( _global_wantarray )
+      /*@SWIG:MXPUSHUA@*/
+      {
+        AV* tempav = newAV();
+        int i;
+        for(i=0 ; i < (*_global_p_len) ; i++)
+        av_push(tempav, newSVuv(arg7[i]));
+        /*@SWIG:MXPUSHR@*/
+        /*@SWIG:XPUSHS@*/
+        if (argvi >= items)
+        EXTEND(sp, 1);
+        ST(argvi) = sv_2mortal(newRV_noinc((SV *)tempav));
+        argvi++
+        /*@SWIG@*/
+        /*@SWIG@*/;
+      }
+      /*@SWIG@*/;
+    }
     
     
     
@@ -2534,22 +2575,37 @@ XS(_wrap_fribidi_log2vis_get_embedding_levels) {
     _saved[0] = ST(1);
     result = (fribidi_boolean)fribidi_log2vis_get_embedding_levels(arg1,arg2,arg3,arg4);
     
-    
-    if (_global_wantarray) {
-      mXPUSHu(*(arg3));
-      argvi++;
+    {
+      if (_global_wantarray) {
+        /*@SWIG:MXPUSHU@*/
+        /*@SWIG:XPUSHS@*/
+        if (argvi >= items)
+        EXTEND(sp, 1);
+        ST(argvi) = sv_2mortal(newSVuv(*(arg3)));
+        argvi++
+        /*@SWIG@*/
+        /*@SWIG@*/;
+      }
     }
-    
-    
-    if ( 1 ) {
-      AV* tempav = newAV();
-      int i;
-      for(i=0 ; i < (*_global_p_len) ; i++)
-      av_push(tempav, newSVuv(arg4[i]));
-      XPUSHs(sv_2mortal(newRV_noinc((SV *) tempav)));
-      argvi++;
+    {
+      if ( 1 )
+      /*@SWIG:MXPUSHUA@*/
+      {
+        AV* tempav = newAV();
+        int i;
+        for(i=0 ; i < (*_global_p_len) ; i++)
+        av_push(tempav, newSVuv(arg4[i]));
+        /*@SWIG:MXPUSHR@*/
+        /*@SWIG:XPUSHS@*/
+        if (argvi >= items)
+        EXTEND(sp, 1);
+        ST(argvi) = sv_2mortal(newRV_noinc((SV *)tempav));
+        argvi++
+        /*@SWIG@*/
+        /*@SWIG@*/;
+      }
+      /*@SWIG@*/;
     }
-    
     
     
     if (SWIG_IsNewObj(res3)) free((char*)arg3);
@@ -2618,21 +2674,35 @@ XS(_wrap_fribidi_remove_bidi_marks) {
     _saved[1] = ST(1);
     result = (FriBidiStrIndex)fribidi_remove_bidi_marks(arg1,arg2,arg3,arg4,arg5);
     
-    
-    mXPUSHp((const char *)(arg1), 
-      (STRLEN)( (result) * sizeof(FriBidiChar)));
-    argvi++;
-    
-    
-    if ( arg4 ) {
-      AV* tempav = newAV();
-      int i;
-      for(i=0 ; i < result ; i++)
-      av_push(tempav, newSVuv(arg4[i]));
-      XPUSHs(sv_2mortal(newRV_noinc((SV *) tempav)));
-      argvi++;
+    {
+      /*@SWIG:MXPUSHP@*/
+      /*@SWIG:XPUSHS@*/
+      if (argvi >= items)
+      EXTEND(sp, 1);
+      ST(argvi) = sv_2mortal(newSVpvn((const char *)(arg1),(STRLEN)( (result) * sizeof(FriBidiChar))));
+      argvi++
+      /*@SWIG@*/
+      /*@SWIG@*/;
     }
-    
+    {
+      if ( arg4 )
+      /*@SWIG:MXPUSHUA@*/
+      {
+        AV* tempav = newAV();
+        int i;
+        for(i=0 ; i < result ; i++)
+        av_push(tempav, newSVuv(arg4[i]));
+        /*@SWIG:MXPUSHR@*/
+        /*@SWIG:XPUSHS@*/
+        if (argvi >= items)
+        EXTEND(sp, 1);
+        ST(argvi) = sv_2mortal(newRV_noinc((SV *)tempav));
+        argvi++
+        /*@SWIG@*/
+        /*@SWIG@*/;
+      }
+      /*@SWIG@*/;
+    }
     
     
     
@@ -2712,16 +2782,25 @@ XS(_wrap_fribidi_get_types) {
     }
     fribidi_get_types(arg1,arg2,arg3);
     
-    
-    if ( 1 ) {
-      AV* tempav = newAV();
-      int i;
-      for(i=0 ; i < (*_global_p_len) ; i++)
-      av_push(tempav, newSVuv(arg3[i]));
-      XPUSHs(sv_2mortal(newRV_noinc((SV *) tempav)));
-      argvi++;
+    {
+      if ( 1 )
+      /*@SWIG:MXPUSHUA@*/
+      {
+        AV* tempav = newAV();
+        int i;
+        for(i=0 ; i < (*_global_p_len) ; i++)
+        av_push(tempav, newSVuv(arg3[i]));
+        /*@SWIG:MXPUSHR@*/
+        /*@SWIG:XPUSHS@*/
+        if (argvi >= items)
+        EXTEND(sp, 1);
+        ST(argvi) = sv_2mortal(newRV_noinc((SV *)tempav));
+        argvi++
+        /*@SWIG@*/
+        /*@SWIG@*/;
+      }
+      /*@SWIG@*/;
     }
-    
     
     
     
@@ -2880,11 +2959,16 @@ XS(_wrap_fribidi_cap_rtl_to_unicode) {
     Newx(*temp3, ((*_global_p_len) + 1), FriBidiChar);
     result = (int)fribidi_cap_rtl_to_unicode(arg1,arg2,arg3);
     
-    
-    mXPUSHp((char *)(arg3), 
-      (STRLEN)( (result) * sizeof(FriBidiChar)));
-    argvi++;
-    
+    {
+      /*@SWIG:MXPUSHP@*/
+      /*@SWIG:XPUSHS@*/
+      if (argvi >= items)
+      EXTEND(sp, 1);
+      ST(argvi) = sv_2mortal(newSVpvn((char *)(arg3),(STRLEN)( (result) * sizeof(FriBidiChar))));
+      argvi++
+      /*@SWIG@*/
+      /*@SWIG@*/;
+    }
     
     
     if (arg3) Safefree(arg3);
@@ -2929,11 +3013,16 @@ XS(_wrap_fribidi_unicode_to_cap_rtl) {
     Newx(*temp3, 2*((*_global_p_len) + 1), char);
     result = (int)fribidi_unicode_to_cap_rtl(arg1,arg2,arg3);
     
-    
-    mXPUSHp((char *)(arg3), 
-      (STRLEN)( (result) * sizeof(char)));
-    argvi++;
-    
+    {
+      /*@SWIG:MXPUSHP@*/
+      /*@SWIG:XPUSHS@*/
+      if (argvi >= items)
+      EXTEND(sp, 1);
+      ST(argvi) = sv_2mortal(newSVpvn((char *)(arg3),(STRLEN)( (result) * sizeof(char))));
+      argvi++
+      /*@SWIG@*/
+      /*@SWIG@*/;
+    }
     
     
     

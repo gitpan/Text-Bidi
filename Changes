@@ -1,5 +1,11 @@
 Revision history for Text-Bidi
 
+0.03    18.01.2007
+        * The PUSH macros caused some weird results, replaced with my own 
+          macros
+        * Apparently, Newx did not exist before 5.8.8, defined it if does not 
+          exist
+
 0.02    17.01.2007
         * Fixed memory leak in remove_bidi_marks when called with two 
           arguments

@@ -34,6 +34,42 @@
 (GIMME_V == G_ARRAY)
 %enddef
 
+/* Macros for pushing return arguments on the stack */
+
+/* push (and mortalise) an SV */
+%define XPUSHS(VAL)
+  if (argvi >= items)
+    EXTEND(sp, 1);
+  ST(argvi) = sv_2mortal(VAL);
+  argvi++
+%enddef
+
+/* push an unsigned int */
+%define MXPUSHU(uv)
+  XPUSHS(newSVuv(uv))
+%enddef
+
+/* push string pv of length len */
+%define MXPUSHP(pv,len)
+  XPUSHS(newSVpvn(pv,len))
+%enddef
+
+/* push a ref to an sv */
+%define MXPUSHR(sv)
+  XPUSHS(newRV_noinc((SV *)sv))
+%enddef
+
+/* push an array (ref) of unsigned (of length len) */
+%define MXPUSHUA(ua,len)
+  {
+    AV* tempav = newAV();
+    int i;
+    for(i=0 ; i < len ; i++)
+      av_push(tempav, newSVuv(ua[i]));
+    MXPUSHR(tempav);
+  }
+%enddef
+
 %typemap(default,noblock=1) FriBidiCharType* pbase_dirs
 (FriBidiCharType temp, short _global_wantarray) {
   temp = FRIBIDI_TYPE_ON;
@@ -41,12 +77,11 @@
   _global_wantarray = WANTARRAY;
 }
 
-%typemap(argout) FriBidiCharType *pbase_dirs %{
+%typemap(argout) FriBidiCharType *pbase_dirs {
   if (_global_wantarray) {
-    mXPUSHu(*($1));
-    argvi++;
+    MXPUSHU(*($1));
   }
-%}
+}
 
 %typemap(out) fribidi_boolean ""
 %typemap(out) FriBidiStrIndex ""
@@ -77,11 +112,10 @@
   Newx(*temp$argnum, ((*_global_p_len) + 1), $*1_ltype);
 }
 
-%typemap(argout) FriBidiChar* visual_str %{
-  mXPUSHp((const char *)($1), 
+%typemap(argout) FriBidiChar* visual_str {
+  MXPUSHP((const char *)($1), 
           (STRLEN)( (*_global_p_len) * sizeof($*1_ltype)));
-  argvi++;
-%}
+}
 
 %typemap(freearg) FriBidiChar* visual_str %{
   if ($1) Safefree($1);
@@ -104,16 +138,10 @@
     }
   }
 
-  %typemap(argout) Type* NEWOPT %{
-    if ( Check ) {
-      AV* tempav = newAV();
-      int i;
-      for(i=0 ; i < (*_global_p_len) ; i++)
-        av_push(tempav, newSVuv($1[i]));
-      XPUSHs(sv_2mortal(newRV_noinc((SV *) tempav)));
-      argvi++;
-    }
-  %}
+  %typemap(argout) Type* NEWOPT {
+    if ( Check )
+      MXPUSHUA($1,(*_global_p_len));
+  }
 
   %typemap(freearg) Type* NEWOPT %{
     if ($1) Safefree($1);
@@ -129,6 +157,9 @@ OPTOUTARR(FriBidiCharType, type, 1);
                                  FriBidiStrIndex* position_V_to_L_list }
 
 %inline %{
+#ifndef Newx
+#define Newx(A,B,C) New(42,A,B,C)
+#endif
 #include <fribidi/fribidi.h>
 FRIBIDI_API void log2vis ( /* input */
                            FriBidiChar *str,
@@ -158,12 +189,12 @@ fribidi_log2vis_get_embedding_levels (	/* input */
                                         /* output */
                                         FriBidiLevel *emb_levels);
 
+/* by default, inherit from str */
 %apply FriBidiChar* str { FriBidiChar *inout }
-%typemap(argout) FriBidiChar* inout %{
-  mXPUSHp((const char *)($1), 
+%typemap(argout) FriBidiChar* inout {
+  MXPUSHP((const char *)($1), 
           (STRLEN)( (result) * sizeof($*1_ltype)));
-  argvi++;
-%}
+}
 
 %typemap(in,numinputs=0) FriBidiLevel *embedding_level_in ""
 %typemap(in,numinputs=0) FriBidiStrIndex *position_to_this_list ""
@@ -186,16 +217,10 @@ fribidi_log2vis_get_embedding_levels (	/* input */
   }
 }
 
-%typemap(argout) FriBidiStrIndex *position_from_this_list %{
-  if ( $1 ) {
-    AV* tempav = newAV();
-    int i;
-    for(i=0 ; i < result ; i++)
-      av_push(tempav, newSVuv($1[i]));
-    XPUSHs(sv_2mortal(newRV_noinc((SV *) tempav)));
-    argvi++;
-  }
-%}
+%typemap(argout) FriBidiStrIndex *position_from_this_list {
+  if ( $1 )
+    MXPUSHUA($1,result);
+}
 
 %typemap(freearg) FriBidiStrIndex *position_from_this_list %{
   if ($1) Safefree($1);
@@ -233,11 +258,10 @@ FRIBIDI_API void fribidi_set_reorder_nsm (fribidi_boolean);
   Newx(*temp$argnum, 2*((*_global_p_len) + 1), $*1_ltype);
 }
 
-%typemap(argout) char* out, FriBidiChar* out %{
-  mXPUSHp((char *)($1), 
+%typemap(argout) char* out, FriBidiChar* out {
+  MXPUSHP((char *)($1), 
           (STRLEN)( (result) * sizeof($*1_ltype)));
-  argvi++;
-%}
+}
 
 fribidi_boolean fribidi_char_set_enter_cap_rtl (void);
 
@@ -249,5 +273,5 @@ int fribidi_unicode_to_cap_rtl (FriBidiChar *str, FriBidiStrIndex len,
                           char *out);
 
 
-/* vim: fo-=t comments-=:% cindent sw=2: */
+/* vim: set fo-=t comments-=\:% cindent sw=2: */
 

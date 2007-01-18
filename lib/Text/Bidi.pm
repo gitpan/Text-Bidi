@@ -12,7 +12,7 @@ Text::Bidi - Unicode bidi algorithm using libfribidi
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 use Encode;
