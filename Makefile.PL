@@ -1,18 +1,41 @@
 use ExtUtils::MakeMaker;
+my (%fribidi, $libs, $cflags);
+eval { use ExtUtils::PkgConfig };
+if ( $@ ) {
+    warn $@;
+} else {
+    %fribidi = eval { ExtUtils::PkgConfig->find('fribidi') };
+}
+if ( %fribidi ) {
+    $libs = $fribidi{'libs'};
+    $cflags = $fribidi{'cflags'};
+} else {
+    warn "Using heuristic values for CFLAGS and LIBS\n";
+    $libs = '-lfribidi';
+    $cflags = '-I/usr/include/fribidi';
+}
+
 WriteMakefile(
     NAME => 'Text::Bidi::private',
+    EXE_FILES => ['bin/fribidi.pl'],
     VERSION_FROM => 'lib/Text/Bidi.pm',
     ABSTRACT_FROM => 'lib/Text/Bidi.pm',
     DISTNAME => 'Text-Bidi',
-    LIBS => '-lfribidi',
+    INC => $cflags,
+    LIBS => $libs,
+    LICENSE => 'perl',
+    AUTHOR => 'Moshe Kamensky <kamensky@cpan.org>',
+    BUILD_REQUIRES => { 'ExtUtils::PkgConfig' => 0 },
+    META_MERGE => { no_index => {package => [qw(Text::Bidi::private)]},
+                    keywords => [qw(bidi rtl hebrew arabic)]},
     OPTIMIZE => '-ggdb3',
     OBJECT => 'private.o',
 );
 
 sub MY::postamble {
-    <<'EOF';
+    <<EOF;
 private.c: swig/fribidi.i
-	-/usr/bin/swig -perl -Wall -I/usr/include -outdir lib/Text/Bidi/ -o $@ $<
+	-/usr/bin/swig -perl -Wall -I/usr/include $cflags -outdir lib/Text/Bidi/ -o \$@ \$<
 
 swig-clean: clean
 	-rm private.c lib/Text/Bidi/private.pm

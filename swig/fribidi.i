@@ -9,9 +9,9 @@
  * The general form of some functions in libfribidi is that an input string 
  * is supplied together with its length, as well as some pointer for the 
  * outputs of the function, which are arrays of the same length. Thus, the 
- * same parameter specifies the length of several arrays. We deal with it in 
- * the following way (adapted from list-vector.i in the guile part of the 
- * swig distribution):
+ * same integer parameter specifies the length of several arrays. We deal 
+ * with it in the following way (adapted from list-vector.i in the guile part 
+ * of the swig distribution):
  * The length is an "ignore" argument (numinputs=0), whose translation thus 
  * appears near the beginning. We allocate a (function-) global variable to 
  * hold the value in its typemap. The input string is then dealt with using a 
@@ -27,250 +27,194 @@
 
 %include "typemaps.i"
 
-%apply unsigned long *INPUT { FriBidiCharType *pbase_dirs }
-%apply unsigned long *OUTPUT { FriBidiChar *mirrored_ch }
+/**************************************************************/
 
-%define WANTARRAY
-(GIMME_V == G_ARRAY)
-%enddef
-
-/* Macros for pushing return arguments on the stack */
-
-/* push (and mortalise) an SV */
-%define XPUSHS(VAL)
-  if (argvi >= items)
-    EXTEND(sp, 1);
-  ST(argvi) = sv_2mortal(VAL);
-  argvi++
-%enddef
-
-/* push an unsigned int */
-%define MXPUSHU(uv)
-  XPUSHS(newSVuv(uv))
-%enddef
-
-/* push string pv of length len */
-%define MXPUSHP(pv,len)
-  XPUSHS(newSVpvn(pv,len))
-%enddef
-
-/* push a ref to an sv */
-%define MXPUSHR(sv)
-  XPUSHS(newRV_noinc((SV *)sv))
-%enddef
-
-/* push an array (ref) of unsigned (of length len) */
-%define MXPUSHUA(ua,len)
-  {
-    AV* tempav = newAV();
-    int i;
-    for(i=0 ; i < len ; i++)
-      av_push(tempav, newSVuv(ua[i]));
-    MXPUSHR(tempav);
-  }
-%enddef
-
-%typemap(default,noblock=1) FriBidiCharType* pbase_dirs
-(FriBidiCharType temp, short _global_wantarray) {
-  temp = FRIBIDI_TYPE_ON;
-  $1 = &temp;
-  _global_wantarray = WANTARRAY;
-}
-
-%typemap(argout) FriBidiCharType *pbase_dirs {
-  if (_global_wantarray) {
-    MXPUSHU(*($1));
-  }
-}
-
-%typemap(out) fribidi_boolean ""
-%typemap(out) FriBidiStrIndex ""
-%typemap(out) int ""
-
-/* apparently, prefixing _global to temp variable name makes it global (no 
- * name mangling)
- */
-%typemap(in,numinputs=0) FriBidiStrIndex len (FriBidiStrIndex* _global_p_len) %{
-  $1 = 0;
-  _global_p_len = &$1;
-%}
-
-%typemap(in,noblock=1) FriBidiChar* str (char* buf = 0, size_t size = 0) {
-  buf = SvPV($input, size);
-  *_global_p_len = %numeric_cast(size/sizeof($*1_ltype), FriBidiStrIndex);
-  $1 = %static_cast(buf, $1_ltype);
-}
-
-/* the following three typemaps take care of a string arg, whose length is 
- * stored in *_global_p_len
- */
-%typemap(in,numinputs=0) FriBidiChar* visual_str ($1_ltype* temp) %{
-  temp = &$1;
-%}
-
-%typemap(check,noblock=1) FriBidiChar* visual_str {
-  Newx(*temp$argnum, ((*_global_p_len) + 1), $*1_ltype);
-}
-
-%typemap(argout) FriBidiChar* visual_str {
-  MXPUSHP((const char *)($1), 
-          (STRLEN)( (*_global_p_len) * sizeof($*1_ltype)));
-}
-
-%typemap(freearg) FriBidiChar* visual_str %{
-  if ($1) Safefree($1);
-%}
-
-/* same,but where the output argument is optional, depending on the context 
- * (scalar/array). The arguments of the macro are the type to which the 
- * variable points, the name of the variable, and the expression to use when 
- * checking if we are in array context.
- */
-
-%define OPTOUTARR(Type, NEWOPT, Check)
+/* string output */
+%define OUTSTR(Type, NEWOPT)
   %typemap(in,numinputs=0) Type* NEWOPT ($1_ltype* temp) %{
     temp = &$1;
   %}
 
-  %typemap(check,noblock=1) Type* NEWOPT {
-    if ( Check ) {
-      Newx(*temp$argnum, ((*_global_p_len) + 1), $*1_ltype);
-    }
-  }
+  %typemap(check) Type* NEWOPT %{
+    Newx(*temp$argnum, ((*_global_p_len) + 1), $*1_ltype);
+  %}
 
-  %typemap(argout) Type* NEWOPT {
-    if ( Check )
-      MXPUSHUA($1,(*_global_p_len));
-  }
+  %typemap(argout) Type* NEWOPT %{
+    MXPUSHP((const char *)($1), 
+            (STRLEN)( (result) * sizeof($*1_ltype)));
+  %}
 
   %typemap(freearg) Type* NEWOPT %{
     if ($1) Safefree($1);
   %}
 %enddef
-    
-OPTOUTARR(FriBidiStrIndex, NEWOPT, _global_wantarray);
-OPTOUTARR(FriBidiLevel, embedding_level_list, _global_wantarray);
-OPTOUTARR(FriBidiLevel, emb_levels, 1);
-OPTOUTARR(FriBidiCharType, type, 1);
 
-%apply FriBidiStrIndex* NEWOPT { FriBidiStrIndex* position_L_to_V_list,
-                                 FriBidiStrIndex* position_V_to_L_list }
+%define OUTARR(Type, NEWOPT)
+  %typemap(in,numinputs=0) Type* NEWOPT ($1_ltype* temp) %{
+    temp = &$1;
+  %}
+
+  %typemap(check) Type* NEWOPT %{
+    Newx(*temp$argnum, ((*_global_p_len) + 1), $*1_ltype);
+  %}
+
+  %typemap(argout) Type* NEWOPT %{
+  // printf("Pushing into $1\n");
+    MXPUSHUA($1,(*_global_p_len));
+  %}
+
+  %typemap(freearg) Type* NEWOPT %{
+    if ($1) Safefree($1);
+  %}
+%enddef
+
+OUTARR(FriBidiCharType, btypes);
+OUTARR(FriBidiJoiningType, jtypes);
+OUTARR(FriBidiLevel, embedding_levels);
+    
+OUTSTR(FriBidiChar, out);
+OUTSTR(char, out);
+
+%typemap(check) char* out %{
+  Newx(*temp$argnum, 2*((*_global_p_len) + 1), $*1_ltype);
+%}
+
+OUTSTR(char, utf8out);
+
+/* the size of the output string may grow because of control seqs. */
+%typemap(check) char* utf8out %{
+  Newx(*temp$argnum, 4*((*_global_p_len) + 1), $*1_ltype);
+%}
+
+%typemap(in,numinputs=0) const FriBidiStrIndex len (FriBidiStrIndex* _global_p_len) %{
+  $1 = 0;
+  _global_p_len = &$1;
+%}
+
+%typemap(in) const FriBidiChar* str (char* buf = 0, size_t size = 0) %{
+  buf = SvPV($input, size);
+  *_global_p_len = (FriBidiStrIndex)(size/sizeof($*1_ltype));
+  $1 = ($1_ltype)(buf);
+%}
+
+%apply const FriBidiChar* str { const FriBidiCharType* bidi_types }
+%apply unsigned long *OUTPUT { FriBidiChar *mirrored_ch }
+
+%typemap(check) const FriBidiLevel* embedding_levels ""
+%typemap(argout) const FriBidiLevel* embedding_levels ""
+%typemap(freearg) const FriBidiLevel* embedding_levels ""
+
+%apply const FriBidiChar* str { const FriBidiLevel* embedding_levels }
+
+/* input/output str */
+%typemap(in) FriBidiChar* str %{
+  $1 = ($1_ltype)SvPV_nolen($input);
+%}
+
+%typemap(argout) FriBidiChar* str %{
+  MXPUSHP((const char *)($1), (STRLEN)( (*_global_p_len) * sizeof($*1_ltype)));
+%}
+
+%typemap(argout) const FriBidiChar* str ""
+
+
+%typemap(default) FriBidiParType* pbase_dir (FriBidiParType temp) %{
+  temp = FRIBIDI_PAR_ON;
+  $1 = &temp;
+%}
+
+%apply unsigned long *INOUT { FriBidiParType* pbase_dir }
+
+%typemap(in) const FriBidiCharType* bd_types (char* buf = 0, size_t size = 0, FriBidiStrIndex* _global_p_len, FriBidiStrIndex _len) %{
+  buf = SvPV($input, size);
+  _len = (FriBidiStrIndex)(size/sizeof($*1_ltype));
+  _global_p_len = &_len;
+  $1 = ($1_ltype)(buf);
+%}
+
+%typemap(in) FriBidiLevel *emb_levels, FriBidiStrIndex *map %{
+  $1 = ($1_ltype)SvPV_nolen($input);
+%}
+
+%typemap(argout) FriBidiLevel *emb_levels, FriBidiStrIndex *map %{
+  MXPUSHUA($1, (*_global_p_len))
+%}
+
+%apply const FriBidiChar* str { const char* s }
+
+%apply int { FriBidiStrIndex }
+%apply unsigned long { FriBidiFlags, FriBidiParType }
+
+
+%rename("%(strip:[fribidi_])s") "";
+
+%import "fribidi-common.h"
+%include "fribidi-unicode.h"
+%include "fribidi-bidi-types.h"
+%include "fribidi-flags.h"
+%include "fribidi-joining-types.h"
+%include "fribidi-mirroring.h"
+%include "fribidi-bidi.h"
 
 %inline %{
+//%define WANTARRAY
+//(GIMME_V == G_ARRAY)
+//%enddef
+
 #ifndef Newx
 #define Newx(A,B,C) New(42,A,B,C)
 #endif
-#include <fribidi/fribidi.h>
-FRIBIDI_API void log2vis ( /* input */
-                           FriBidiChar *str,
-                           FriBidiStrIndex len,
-                           /* output */
-                           FriBidiChar *visual_str,
-                           FriBidiCharType *pbase_dirs,
-                           FriBidiStrIndex *position_L_to_V_list,
-                           FriBidiStrIndex *position_V_to_L_list,
-                           FriBidiLevel *embedding_level_list) {
-    fribidi_log2vis(str, len, pbase_dirs, visual_str, position_L_to_V_list, 
-                    position_V_to_L_list, embedding_level_list);
-}
+/* Macros for pushing return arguments on the stack. These are available only  
+ * in recent versions of perl
+ */
 
-%}
+/* push (and mortalise) an SV */
+#define XPUSHS(VAL) \
+  if (argvi >= items)\
+    EXTEND(sp, 1);\
+  ST(argvi)=sv_2mortal(VAL);\
+  argvi++
 
-%import "fribidi/fribidi_config.h"
-%import "fribidi/fribidi_char_sets.h"
-%include "fribidi/fribidi_unicode.h"
-%include "fribidi/fribidi_types.h"
+/* push an unsigned int */
+#define MXPUSHU(uv) XPUSHS(newSVuv(uv))
 
-FRIBIDI_API fribidi_boolean
-fribidi_log2vis_get_embedding_levels (	/* input */
-                                        FriBidiChar *str,
-                                        FriBidiStrIndex len,
-                                        FriBidiCharType *pbase_dirs,
-                                        /* output */
-                                        FriBidiLevel *emb_levels);
+/* push string pv of length len */
+#define MXPUSHP(pv,len) XPUSHS(newSVpvn(pv,len))
 
-/* by default, inherit from str */
-%apply FriBidiChar* str { FriBidiChar *inout }
-%typemap(argout) FriBidiChar* inout {
-  MXPUSHP((const char *)($1), 
-          (STRLEN)( (result) * sizeof($*1_ltype)));
-}
+/* push a ref to an sv */
+#define MXPUSHR(sv) XPUSHS(newRV_noinc((SV *)sv))
 
-%typemap(in,numinputs=0) FriBidiLevel *embedding_level_in ""
-%typemap(in,numinputs=0) FriBidiStrIndex *position_to_this_list ""
-%typemap(default) FriBidiStrIndex *position_from_this_list ""
-%typemap(in,noblock=1) FriBidiStrIndex *position_from_this_list {
-  if (SvOK($input)) {
-    AV* buf;
-    size_t size;
-    size_t i;
-    buf = (AV*)(SvRV($input));
-    size = av_len(buf) + 1;
-    Newx($1, size, $*1_ltype);
-    for(i=0;i < size; i++) {
-      SV** sv = av_fetch(buf, i, 0);
-      if ( sv )
-        $1[i] = %numeric_cast(SvUV(*sv), $*1_ltype);
-      else
-        $1[i] = -1;
-    }
+/* push an array (ref) of unsigned (of length len) */
+#define MXPUSHUA(ua,len) {\
+    AV* tempav = newAV();\
+    int i;\
+    for(i=0 ; i < len ; i++) {\
+      av_push(tempav, newSVuv(ua[i]));}\
+    MXPUSHR(tempav);\
   }
+
+#include <fribidi.h>
+
+FriBidiStrIndex utf8_to_internal (const char *s, const FriBidiStrIndex len,
+                       /* Output */
+                       FriBidiChar *out) {
+  return fribidi_charset_to_unicode(FRIBIDI_CHAR_SET_UTF8, s, len, out);
 }
 
-%typemap(argout) FriBidiStrIndex *position_from_this_list {
-  if ( $1 )
-    MXPUSHUA($1,result);
+FriBidiStrIndex internal_to_utf8 (const FriBidiChar *str, const FriBidiStrIndex len,
+                       /* Output */
+                       char *utf8out) {
+  return fribidi_unicode_to_charset(FRIBIDI_CHAR_SET_UTF8, str, len, utf8out);
 }
 
-%typemap(freearg) FriBidiStrIndex *position_from_this_list %{
-  if ($1) Safefree($1);
+FriBidiLevel reorder_map (const FriBidiFlags flags,
+    const FriBidiCharType *bd_types, const FriBidiStrIndex off,
+    const FriBidiStrIndex length,      const FriBidiParType base_dir,
+    FriBidiLevel *emb_levels,          FriBidiStrIndex *map) {
+  return fribidi_reorder_line(
+      flags, bd_types, length, off, base_dir, emb_levels, NULL, map);
+}
 %}
-
-FRIBIDI_API FriBidiStrIndex
-fribidi_remove_bidi_marks(FriBidiChar *inout,
-                          FriBidiStrIndex len,
-                          FriBidiStrIndex *position_to_this_list,
-                          FriBidiStrIndex *position_from_this_list,
-                          FriBidiLevel *embedding_level_in);
-
-FRIBIDI_API FriBidiCharType fribidi_get_type (FriBidiChar uch);
-
-FRIBIDI_API void fribidi_get_types (   /* input */
-				       FriBidiChar *str,
-				       FriBidiStrIndex len,
-				       /* output */
-				       FriBidiCharType *type);
-
-FRIBIDI_API fribidi_boolean fribidi_get_mirror_char (	/* Input */
-                                                FriBidiChar ch,
-                                                /* Output */
-                                                FriBidiChar *mirrored_ch);
-
-FRIBIDI_API void fribidi_set_mirroring (fribidi_boolean mirror);
-FRIBIDI_API void fribidi_set_reorder_nsm (fribidi_boolean);
-
-/* from fribidi_char_sets_cap_rtl.h */
-%apply FriBidiChar* str { char* s }
-%apply FriBidiChar* visual_str { char *out, FriBidiChar* out }
-
-/* the size of the output string may grow because of control seqs. */
-%typemap(check,noblock=1) char* out {
-  Newx(*temp$argnum, 2*((*_global_p_len) + 1), $*1_ltype);
-}
-
-%typemap(argout) char* out, FriBidiChar* out {
-  MXPUSHP((char *)($1), 
-          (STRLEN)( (result) * sizeof($*1_ltype)));
-}
-
-fribidi_boolean fribidi_char_set_enter_cap_rtl (void);
-
-int fribidi_cap_rtl_to_unicode (char *s, FriBidiStrIndex len,
-                          /* Output */
-                          FriBidiChar *out);
-int fribidi_unicode_to_cap_rtl (FriBidiChar *str, FriBidiStrIndex len,
-                          /* Output */
-                          char *out);
 
 
 /* vim: set fo-=t comments-=\:% cindent sw=2: */

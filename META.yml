@@ -1,11 +1,28 @@
---- #YAML:1.0
-name:                Text-Bidi
-version:             0.03
-abstract:            Unicode bidi algorithm using libfribidi
-license:             ~
-generated_by:        ExtUtils::MakeMaker version 6.31
-distribution_type:   module
-requires:     
+---
+abstract: 'Unicode bidi algorithm using libfribidi'
+author:
+  - 'Moshe Kamensky <kamensky@cpan.org>'
+build_requires:
+  ExtUtils::PkgConfig: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.132140'
+keywords:
+  - bidi
+  - rtl
+  - hebrew
+  - arabic
+license: perl
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Text-Bidi
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Text::Bidi::private
+requires: {}
+version: 2.00

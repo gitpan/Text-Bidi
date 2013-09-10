@@ -5,12 +5,15 @@ MANIFEST
 README
 private.c
 lib/Text/Bidi.pm
-lib/Text/Bidi/mirrored.pm
-lib/Text/Bidi/CapRTL.pm
+lib/Text/Bidi/Paragraph.pm
 lib/Text/Bidi/private.pm
+lib/Text/Bidi/Array/Byte.pm
+lib/Text/Bidi/Array/Long.pm
+bin/fribidi.pl
 swig/fribidi.i
 t/00-load.t
 t/pod.t
-t/CapRTL_implicit.t
-t/CapRTL_explicit.t
-META.yml                                 Module meta-data (added by MakeMaker)
+misc/bidi
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

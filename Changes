@@ -1,4 +1,13 @@
 Revision history for Text-Bidi
+2.00    10.09.2013
+        Almost completely rewritten, mostly due to the changes in libfribidi.  
+        The interface has changed as well, so this version is incompatible 
+        with the previous ones.
+
+0.04    07.02.2008
+        * Changed the build system to use ExtUtils::PkgConfig (if available), 
+          to find the correct compilation flags (this is required since the 
+          new version of libfribidi may need glib to build.)
 
 0.03    18.01.2007
         * The PUSH macros caused some weird results, replaced with my own 
