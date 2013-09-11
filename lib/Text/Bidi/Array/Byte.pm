@@ -1,18 +1,25 @@
 # $Id$
 # Created: Tue 27 Aug 2013 06:09:42 PM IDT
-# Last Changed: Tue 27 Aug 2013 06:11:00 PM IDT
+# Last Changed: Wed 11 Sep 2013 11:44:57 AM IDT
 
 =head1 NAME
 
-Text::Bidi::Array::Byte - XXX
+Text::Bidi::Array::Byte - Dual-life byte arrays
 
 =head1 SYNOPSIS
 
-XXX
+    use Text::Bidi::Array::Byte;
+    my $a = new Text::Bidi::Array::Byte "abc";
+    say $a->[1]; # says 98
+    say $$a; # says abc
+    say "$a"; # also says abc
 
 =head1 DESCRIPTION
 
-XXX
+This is an derived class of L<Text::Bidi::Array> designed to hold C<byte> 
+arrays. See L<Text::Bidi::Array> for details on usage of this class. Each 
+element of the array representation corresponds to an octet in the string 
+representation, at the same location.
 
 =cut
 
@@ -22,41 +29,17 @@ use 5.10.0;
 use warnings;
 use integer;
 use strict;
+use Carp;
 
-our $VERSION = 1.0;
+our $VERSION = 1.1;
 
-use Tie::Array;
-use base qw(Tie::Array);
-use overload 
-    '${}' => 'as_scalar', '@{}' => 'as_array', '""' => 'data', fallback => 1;
+use Text::Bidi::Array;
+use base qw(Text::Bidi::Array);
 
-=head1 METHODS
-
-=cut
-
-sub TIEARRAY {
-    my $class = shift;
-    my $data = shift || 0;
-    if ( ref($data) ) {
-        my @data = eval { @$data };
-        $data = pack('C*', @data) unless $@;
-    }
-    my $self = { data => $data, @_ };
-    bless $self => $class
+sub pack {
+    shift;
+    pack('C*', @_)
 }
-
-sub data : lvalue { $_[0]->{'data'} }
-
-sub new {
-    my $class = shift;
-    my $self = tie(my @magic, $class, @_);
-    $self->{'magic'} = \@magic;
-    $self
-}
-
-sub as_scalar { \$_[0]->{'data'} }
-
-sub as_array { $_[0]->{'magic'} }
 
 sub STORE {
     my ( $self, $i, $v ) = @_;
@@ -81,25 +64,11 @@ sub STORESIZE {
     }
 }
 
-sub CLEAR {
-    $_[0]->{'data'} = 0
-}
-
 1;
-
-__END__
-
-=head1 DIAGNOSTICS
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head1 FILES
-
-=head1 BUGS
 
 =head1 AUTHOR
 
-Moshe Kamensky  (E<lt>samvimes@fastmail.fmE<gt>) - Copyright (c) 2013
+Moshe Kamensky  (E<lt>kamensky@cpan.orgE<gt>) - Copyright (c) 2013
 
 =head1 LICENSE
 

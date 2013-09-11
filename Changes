@@ -1,4 +1,15 @@
 Revision history for Text-Bidi
+2.01    11.09.2013
+        * Refactored Text::Bidi::Array::* to have a common base class 
+          Text::Bidi::Array
+        * Significantly improved the documentation of Text::Bidi::Array*
+        * Fixed a bug in Text::Bidi::Array::Long --- now returns the correct 
+          size
+        * Added loading tests for Text::Bidi::Array*
+        * Removed "no warnings 'experimental'", since this caused tests to 
+          fail on older versions of perl.
+        * Added information about the bidi extension for urxvt to the README 
+          file
 2.00    10.09.2013
         Almost completely rewritten, mostly due to the changes in libfribidi.  
         The interface has changed as well, so this version is incompatible 

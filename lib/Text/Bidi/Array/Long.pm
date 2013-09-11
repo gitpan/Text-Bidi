@@ -1,18 +1,29 @@
 # $Id$
 # Created: Tue 27 Aug 2013 06:12:39 PM IDT
-# Last Changed: Tue 27 Aug 2013 06:40:54 PM IDT
+# Last Changed: Wed 11 Sep 2013 11:47:05 AM IDT
 
 =head1 NAME
 
-Text::Bidi::Array::Long - XXX
+Text::Bidi::Array::Long - Dual-life long arrays
 
 =head1 SYNOPSIS
 
-XXX
+    use Text::Bidi::Array::Long;
+    my $a = new Text::Bidi::Array::Long "abc";
+    say $a->[0]; # says 6513249 (possibly)
+    say $a->[1]; # says 0
+    say $$a; # says abc
+    say "$a"; # also says abc
+
+
 
 =head1 DESCRIPTION
 
-XXX
+This is an derived class of L<Text::Bidi::Array> designed to hold C<long> 
+arrays. See L<Text::Bidi::Array> for details on usage of this class. Each 
+element of the array representation corresponds to 4 octets in the string 
+representation. The 4 octets are packed in the endianness of the native 
+machine.
 
 =cut
 
@@ -25,11 +36,10 @@ use strict;
 use Carp;
 
 
-our $VERSION = 1.0;
+our $VERSION = 1.1;
 
-use Tie::Array;
-use base qw(Tie::Array);
-use overload '${}' => 'as_scalar', '@{}' => 'as_array', fallback => 1;
+use Text::Bidi::Array;
+use base qw(Text::Bidi::Array);
 
 BEGIN {
 # fribidi uses native endianness, vec uses N (big-endian)
@@ -46,35 +56,10 @@ BEGIN {
     }
 }
 
-=head1 METHODS
-
-=cut
-
-
-sub TIEARRAY {
-    my $class = shift;
-    my $data = shift || 0;
-    if ( ref($data) ) {
-        my @data = eval { @$data };
-        croak $@ if $@;
-        $data = pack('L*', @data); # unless $@;
-    }
-    my $self = { data => $data, @_ };
-    bless $self => $class
+sub pack {
+    shift;
+    pack('L*', @_)
 }
-
-sub data : lvalue { $_[0]->{'data'} }
-
-sub new {
-    my $class = shift;
-    my $self = tie(my @magic, $class, @_);
-    $self->{'magic'} = \@magic;
-    $self
-}
-
-sub as_scalar { \$_[0]->{'data'} }
-
-sub as_array { $_[0]->{'magic'} }
 
 sub STORE {
     my ( $self, $i, $v ) = @_;
@@ -87,7 +72,7 @@ sub FETCH {
 }
 
 sub FETCHSIZE {
-    length($_[0]->{'data'})/4
+    (length($_[0]->{'data'})+3)/4
 }
 
 sub STORESIZE {
@@ -99,26 +84,13 @@ sub STORESIZE {
     }
 }
 
-sub CLEAR {
-    $_[0]->{'data'} = 0
-}
-
-
 1;
 
 __END__
 
-=head1 DIAGNOSTICS
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head1 FILES
-
-=head1 BUGS
-
 =head1 AUTHOR
 
-Moshe Kamensky  (E<lt>samvimes@fastmail.fmE<gt>) - Copyright (c) 2013
+Moshe Kamensky  (E<lt>kamensky@cpan.orgE<gt>) - Copyright (c) 2013
 
 =head1 LICENSE
 

@@ -7,12 +7,14 @@ private.c
 lib/Text/Bidi.pm
 lib/Text/Bidi/Paragraph.pm
 lib/Text/Bidi/private.pm
+lib/Text/Bidi/Array.pm
 lib/Text/Bidi/Array/Byte.pm
 lib/Text/Bidi/Array/Long.pm
 bin/fribidi.pl
 swig/fribidi.i
 t/00-load.t
 t/pod.t
+t/simple.t
 misc/bidi
 
 META.yml                                 Module YAML meta-data (added by MakeMaker)

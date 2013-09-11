@@ -4,8 +4,11 @@ This is a perl interface to the libfribidi library that implements the
 Unicode bidi algorithm. The bidi algorithm is a specification for displaying 
 text that consists of both left-to-right and right-to-left written languages.
 
-The current version (2.0) is a complete re-implementation, and the interface 
-is incompatible with older versions.
+The package was complete reimplemented in version 2.0, and the interface is 
+incompatible with older versions.
+
+The package also includes an extension for the urxvt (rxvt-unicode) terminal 
+to display bidi text correctly. It is located in misc/bidi.
 
 PREREQUISITES
 
@@ -25,6 +28,10 @@ To install this module, run the following commands:
     make install
 
 As mentioned above, fribidi should already be installed.
+
+To install the extension for urxvt, simply put it in the urxvt's search path 
+for perl extensions, and add it to the perl-ext-common resource. See 
+urxvtperl(1) for details.
 
 SUPPORT AND DOCUMENTATION
 

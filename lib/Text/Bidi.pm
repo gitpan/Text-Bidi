@@ -2,7 +2,7 @@ package Text::Bidi;
 
 use 5.10.0;
 use warnings;
-no warnings 'experimental';
+#no warnings 'experimental';
 use strict 'vars';
 use Exporter;
 use base qw(Exporter);
@@ -14,7 +14,7 @@ Text::Bidi - Unicode bidi algorithm using libfribidi
 
 =cut
 
-our $VERSION = '2.00';
+our $VERSION = 2.01;
 
 
 use Text::Bidi::private;

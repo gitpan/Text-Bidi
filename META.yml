@@ -25,4 +25,4 @@ no_index:
   package:
     - Text::Bidi::private
 requires: {}
-version: 2.00
+version: 2.01

@@ -1,6 +1,6 @@
 # $Id$
 # Created: Tue 27 Aug 2013 04:10:03 PM IDT
-# Last Changed: Tue 27 Aug 2013 06:20:46 PM IDT
+# Last Changed: Wed 11 Sep 2013 11:49:51 AM IDT
 
 package Text::Bidi::Paragraph;
 
@@ -40,14 +40,13 @@ reordering.
 
 use 5.10.0;
 use warnings;
-no warnings 'experimental';
+#no warnings 'experimental';
 use integer;
 use strict;
-use autodie qw(:all);
 
 use Text::Bidi;
 
-our $VERSION = 2.0;
+our $VERSION = 2.01;
 
 
 =head1 METHODS
@@ -152,8 +151,6 @@ sub init {
     $self->{'_par'} = [split '', $self->_mirpar ];
 }
 
-
-
 =head2 visual()
 
     my $visual = $par->visual($offset, $length, $flags);
@@ -189,7 +186,6 @@ length is potentially reduced, so that the line breaks at the given string
 
 =cut
 
-
 sub visual {
     my ($self, $off, $len, $flags) = @_;
     $off //= 0;
@@ -208,8 +204,6 @@ sub visual {
     $self->{'_levels'} = $bd->tie_byte($levels);
     $bd->reorder($self->_par, $self->map, $off, $mlen)
 }
-
-
 
 1;
 
