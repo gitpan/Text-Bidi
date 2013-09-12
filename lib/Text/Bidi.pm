@@ -14,7 +14,7 @@ Text::Bidi - Unicode bidi algorithm using libfribidi
 
 =cut
 
-our $VERSION = 2.01;
+our $VERSION = 2.02;
 
 
 use Text::Bidi::private;

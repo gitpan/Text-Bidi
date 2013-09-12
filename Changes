@@ -1,4 +1,7 @@
 Revision history for Text-Bidi
+2.0 2   12.09.2013
+        Fixed Makefile.PL
+        
 2.01    11.09.2013
         * Refactored Text::Bidi::Array::* to have a common base class 
           Text::Bidi::Array

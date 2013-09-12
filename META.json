@@ -25,7 +25,7 @@
          "inc"
       ],
       "package" : [
-         "Text::Bidi::private"
+         "Text::Bidi::privatec"
       ]
    },
    "prereqs" : {
@@ -44,5 +44,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.01"
+   "version" : "2.02"
 }

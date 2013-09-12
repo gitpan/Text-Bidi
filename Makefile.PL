@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 my (%fribidi, $libs, $cflags);
-eval { use ExtUtils::PkgConfig };
+eval { require ExtUtils::PkgConfig };
 if ( $@ ) {
     warn $@;
 } else {
@@ -12,7 +12,7 @@ if ( %fribidi ) {
 } else {
     warn "Using heuristic values for CFLAGS and LIBS\n";
     $libs = '-lfribidi';
-    $cflags = '-I/usr/include/fribidi';
+    $cflags = '-I/usr/include/fribidi -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include';
 }
 
 WriteMakefile(
@@ -26,7 +26,7 @@ WriteMakefile(
     LICENSE => 'perl',
     AUTHOR => 'Moshe Kamensky <kamensky@cpan.org>',
     BUILD_REQUIRES => { 'ExtUtils::PkgConfig' => 0 },
-    META_MERGE => { no_index => {package => [qw(Text::Bidi::private)]},
+    META_MERGE => { no_index => {package => [qw(Text::Bidi::privatec)]},
                     keywords => [qw(bidi rtl hebrew arabic)]},
     OPTIMIZE => '-ggdb3',
     OBJECT => 'private.o',

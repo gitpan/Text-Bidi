@@ -23,6 +23,6 @@ no_index:
     - t
     - inc
   package:
-    - Text::Bidi::private
+    - Text::Bidi::privatec
 requires: {}
-version: 2.01
+version: 2.02
