@@ -1,10 +1,80 @@
-# $Id$
 # Created: Wed 11 Sep 2013 09:47:56 AM IDT
-# Last Changed: Wed 11 Sep 2013 11:36:45 AM IDT
+# Last Changed: Mon 23 Sep 2013 09:20:16 AM IDT
+
+use 5.10.0;
+use warnings;
+use integer;
+use strict;
+
+package Text::Bidi::Array;
+{
+  $Text::Bidi::Array::VERSION = '2.06';
+}
+# ABSTRACT: Base class for dual life arrays
+
+
+use Carp;
+
+use Tie::Array;
+use base qw(Tie::Array);
+
+
+use overload 
+    '${}' => 'as_scalar', '@{}' => 'as_array', '""' => 'data', fallback => 1;
+
+
+
+sub new {
+    my $class = shift;
+    my $self = tie(my @magic, $class, @_);
+    $self->{'magic'} = \@magic;
+    $self
+}
+
+
+sub TIEARRAY {
+    my $class = shift;
+    my $data = shift || 0;
+    my $self = { @_ };
+    bless $self => $class;
+    $self->_init($data)
+}
+
+sub _init {
+    my ($self, $data) = @_;
+    if ( ref($data) ) {
+        my @data = eval { @$data };
+        croak $@ if $@;
+        $data = $self->pack(@data);
+    }
+    $self->{'data'} = $data;
+    return $self
+}
+
+
+sub data { $_[0]->{'data'} }
+
+sub as_scalar { \$_[0]->{'data'} }
+
+sub as_array { $_[0]->{'magic'} }
+
+sub CLEAR {
+    $_[0]->{'data'} = 0
+}
+
+1;
+
+__END__
+
+=pod
 
 =head1 NAME
 
 Text::Bidi::Array - Base class for dual life arrays
+
+=head1 VERSION
+
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -13,7 +83,6 @@ Text::Bidi::Array - Base class for dual life arrays
     say $a->[1]; # says 98
     say $$a; # says abc
     say "$a"; # also says abc
-
 
 =head1 DESCRIPTION
 
@@ -24,21 +93,6 @@ packed string. The packing specification depends on the sub-class. These
 classes are used in L<Text::Bidi> to conveniently pass arrays to the 
 underlying fribidi library, but could be of independent interest.
 
-=cut
-
-package Text::Bidi::Array;
-
-use 5.10.0;
-use warnings;
-use integer;
-use strict;
-use Carp;
-
-our $VERSION = 1.0;
-
-use Tie::Array;
-use base qw(Tie::Array);
-
 =head1 OVERLOADED OPERATORS
 
 An object of this type can be dereferenced either as a scalar or as an array.  
@@ -47,11 +101,6 @@ array. In the second, it returns the unpacked array of numbers.
 
 The packed representation is also returned when the object is used as a 
 string.
-
-=cut
-
-use overload 
-    '${}' => 'as_scalar', '@{}' => 'as_array', '""' => 'data', fallback => 1;
 
 =head1 CONSTRUCTION
 
@@ -63,14 +112,7 @@ of the given type, or an array reference (more precisely, anything that can
 be dereferenced as an array), which is then packed according to the rules of 
 B<Type>. If no I<$data> is given, it defaults to 0.
 
-=cut
-
-sub new {
-    my $class = shift;
-    my $self = tie(my @magic, $class, @_);
-    $self->{'magic'} = \@magic;
-    $self
-}
+=for Pod::Coverage new
 
 =head1 SEE ALSO
 
@@ -117,47 +159,17 @@ Return the size of the array represented by C<$self-E<gt>{'data'}>.
 
 =back
 
-=cut
-
-sub TIEARRAY {
-    my $class = shift;
-    my $data = shift || 0;
-    my $self = { @_ };
-    bless $self => $class;
-    $self->init($data)
-}
-
-sub init {
-    my ($self, $data) = @_;
-    if ( ref($data) ) {
-        my @data = eval { @$data };
-        croak $@ if $@;
-        $data = $self->pack(@data);
-    }
-    $self->{'data'} = $data;
-    return $self
-}
-
-sub data { $_[0]->{'data'} }
-
-sub as_scalar { \$_[0]->{'data'} }
-
-sub as_array { $_[0]->{'magic'} }
-
-sub CLEAR {
-    $_[0]->{'data'} = 0
-}
-
-1;
+=for Pod::Coverage data as_scalar as_array
 
 =head1 AUTHOR
 
-Moshe Kamensky  (E<lt>kamensky@cpan.org<gt>) - Copyright (c) 2013
+Moshe Kamensky <kamensky@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This program is free software. You may copy or 
-redistribute it under the same terms as Perl itself.
+This software is copyright (c) 2013 by Moshe Kamensky.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

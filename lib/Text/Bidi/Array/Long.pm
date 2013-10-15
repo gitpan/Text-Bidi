@@ -1,45 +1,23 @@
-# $Id$
 # Created: Tue 27 Aug 2013 06:12:39 PM IDT
-# Last Changed: Wed 11 Sep 2013 11:47:05 AM IDT
-
-=head1 NAME
-
-Text::Bidi::Array::Long - Dual-life long arrays
-
-=head1 SYNOPSIS
-
-    use Text::Bidi::Array::Long;
-    my $a = new Text::Bidi::Array::Long "abc";
-    say $a->[0]; # says 6513249 (possibly)
-    say $a->[1]; # says 0
-    say $$a; # says abc
-    say "$a"; # also says abc
-
-
-
-=head1 DESCRIPTION
-
-This is an derived class of L<Text::Bidi::Array> designed to hold C<long> 
-arrays. See L<Text::Bidi::Array> for details on usage of this class. Each 
-element of the array representation corresponds to 4 octets in the string 
-representation. The 4 octets are packed in the endianness of the native 
-machine.
-
-=cut
-
-package Text::Bidi::Array::Long;
+# Last Changed: Mon 23 Sep 2013 09:00:25 AM IDT
 
 use 5.10.0;
 use warnings;
 use integer;
 use strict;
+
+package Text::Bidi::Array::Long;
+{
+  $Text::Bidi::Array::Long::VERSION = '2.06';
+}
+# ABSTRACT: Dual-life long arrays
+
+
 use Carp;
-
-
-our $VERSION = 1.1;
 
 use Text::Bidi::Array;
 use base qw(Text::Bidi::Array);
+
 
 BEGIN {
 # fribidi uses native endianness, vec uses N (big-endian)
@@ -88,14 +66,44 @@ sub STORESIZE {
 
 __END__
 
+=pod
+
+=head1 NAME
+
+Text::Bidi::Array::Long - Dual-life long arrays
+
+=head1 VERSION
+
+version 2.06
+
+=head1 SYNOPSIS
+
+    use Text::Bidi::Array::Long;
+    my $a = new Text::Bidi::Array::Long "abc";
+    say $a->[0]; # says 6513249 (possibly)
+    say $a->[1]; # says 0
+    say $$a; # says abc
+    say "$a"; # also says abc
+
+=head1 DESCRIPTION
+
+This is an derived class of L<Text::Bidi::Array> designed to hold C<long> 
+arrays. See L<Text::Bidi::Array> for details on usage of this class. Each 
+element of the array representation corresponds to 4 octets in the string 
+representation. The 4 octets are packed in the endianness of the native 
+machine.
+
+=for Pod::Coverage native_to_big big_to_native
+
 =head1 AUTHOR
 
-Moshe Kamensky  (E<lt>kamensky@cpan.orgE<gt>) - Copyright (c) 2013
+Moshe Kamensky <kamensky@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This program is free software. You may copy or 
-redistribute it under the same terms as Perl itself.
+This software is copyright (c) 2013 by Moshe Kamensky.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

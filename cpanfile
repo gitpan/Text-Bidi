@@ -1,0 +1,34 @@
+requires "Carp" => "0";
+requires "DynaLoader" => "0";
+requires "Encode" => "0";
+requires "Exporter" => "0";
+requires "Getopt::Long" => "0";
+requires "Tie::Array" => "0";
+requires "base" => "0";
+requires "integer" => "0";
+requires "open" => "0";
+requires "overload" => "0";
+requires "perl" => "v5.10.0";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'test' => sub {
+  requires "Data::Dumper" => "0";
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "File::Find" => "0";
+  requires "File::Spec::Functions" => "0";
+  requires "File::Temp" => "0";
+  requires "List::Util" => "0";
+  requires "Test::More" => "0";
+  requires "charnames" => "0";
+  requires "utf8" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "6.30";
+};
+
+on 'develop' => sub {
+  requires "Test::CPAN::Meta" => "0";
+  requires "Test::Pod" => "1.41";
+};

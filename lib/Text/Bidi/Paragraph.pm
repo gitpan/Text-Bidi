@@ -1,12 +1,97 @@
-# $Id$
 # Created: Tue 27 Aug 2013 04:10:03 PM IDT
-# Last Changed: Wed 11 Sep 2013 11:49:51 AM IDT
+# Last Changed: Tue 15 Oct 2013 01:10:47 PM IDT
+
+use 5.10.0;
+use warnings;
+#no warnings 'experimental';
+use integer;
+use strict;
 
 package Text::Bidi::Paragraph;
+{
+  $Text::Bidi::Paragraph::VERSION = '2.06';
+}
+# ABSTRACT: Run the bidi algorithm on one paragraph
+
+
+use Text::Bidi;
+
+
+sub new {
+    my $class = shift;
+    my $par = shift;
+    my $self = { @_ };
+    my @bd = ($self->{'bd'});
+    $self->{'bd'} = Text::Bidi::S(@bd);
+    $self->{'par'} = $par;
+    bless $self => $class;
+    $self->_init;
+    $self
+}
+
+
+for my $f ( qw(par bd dir _par _mirpar _unicode _mirrored )) {
+    no strict 'refs';
+    *$f = sub { $_[0]->{$f} };
+}
+
+for my $f ( qw(len types levels map) ) {
+    no strict 'refs';
+    *$f = sub { $_[0]->{"_$f"} };
+}
+
+
+sub is_rtl { $_[0]->dir == $Text::Bidi::private::FRIBIDI_PAR_RTL }
+
+sub _init {
+    my ($self) = (@_);
+    my $par = $self->par;
+    $self->{'_len'} = length($par);
+    my $bd = $self->bd;
+    $self->{'_unicode'} = $bd->utf8_to_internal($par);
+    #$self->{'_par'} = [split '', $par];
+    $self->{'_types'} = $bd->get_bidi_types($self->_unicode);
+    ($self->{'dir'}, $self->{'_levels'}) =
+        $bd->get_par_embedding_levels($self->types, $self->dir);
+    $self->{'_map'} = [0..$#{$self->_unicode}];
+    $self->{'_mirrored'} = $bd->mirrored($self->levels, $self->_unicode);
+    $self->{'_mirpar'} = $bd->internal_to_utf8($self->_mirrored);
+    $self->{'_par'} = [split '', $self->_mirpar ];
+}
+
+
+sub visual {
+    my ($self, $off, $len, $flags) = @_;
+    $off //= 0;
+    $len //= $self->len;
+    my $mlen = $self->len - $off;
+    $mlen = $len if $len < $mlen;
+    if (my $break = eval { $flags->{'break'} } ) {
+        my $lb = length($break);
+        my $nlen = rindex($self->par, $break, $off + $mlen - $lb) - $off + $lb;
+        $mlen = $nlen if $nlen > 0;
+    }
+    my $bd = $self->bd;
+    (my $levels, $self->{'_map'}) = 
+      $bd->reorder_map($self->types, $off, $mlen, $self->dir, 
+                       $self->map, $self->levels, $flags);
+    $self->{'_levels'} = $bd->tie_byte($levels);
+    $bd->reorder($self->_par, $self->map, $off, $mlen)
+}
+
+1;
+
+__END__
+
+=pod
 
 =head1 NAME
 
 Text::Bidi::Paragraph - Run the bidi algorithm on one paragraph
+
+=head1 VERSION
+
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -24,7 +109,7 @@ Text::Bidi::Paragraph - Run the bidi algorithm on one paragraph
 =head1 DESCRIPTION
 
 This class provides the main interface for applying the bidi algorithm in 
-full generality. In the case where the paragraph spans only one visual line, 
+full generality. In the case where the paragraph can be formatted at once, 
 L<Text::Bidi/log2vis> can be used as a shortcut.
 
 A paragraph is processed by creating a L<Text::Bidi::Paragraph> object:
@@ -33,25 +118,12 @@ A paragraph is processed by creating a L<Text::Bidi::Paragraph> object:
 
 Here C<$logical> is the text of the paragraph. This applies the first stages 
 of the bidi algorithm: computation of the embedding levels. Once this is 
-done, the text can be displayed using the L</visual()> method, which does the 
+done, the text can be displayed using the L</visual> method, which does the 
 reordering.
-
-=cut
-
-use 5.10.0;
-use warnings;
-#no warnings 'experimental';
-use integer;
-use strict;
-
-use Text::Bidi;
-
-our $VERSION = 2.01;
-
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
     my $par = new Text::Bidi::Paragraph $logical, ...;
 
@@ -59,99 +131,71 @@ Create a new object corresponding to a text B<$logical> in logical order. The
 other arguments are key-value pairs. The only ones that have a meaning at the 
 moment are I<bd>, which supplies the L<Text::Bidi> object to use, and 
 I<dir>, which prescribes the direction of the paragraph. The value of I<dir> 
-is a constant in C<Text::Bidi::Par::> (e.g., C<$Text::Bidi::Par::RTL>).
+is a constant in C<Text::Bidi::Par::> (e.g., C<$Text::Bidi::Par::RTL>; see 
+L<Text::Bidi::Constants>).
 
 Note that the mere creation of B<$par> runs the bidi algorithm on the given 
 text B<$logical> up to the point of reordering (which is dealt with in 
-L</visual()>).
+L</visual>).
 
-=cut
-
-sub new {
-    my $class = shift;
-    my $par = shift;
-    my $self = { @_ };
-    my @bd = ($self->{'bd'});
-    $self->{'bd'} = Text::Bidi::S(@bd);
-    $self->{'par'} = $par;
-    bless $self => $class;
-    $self->init;
-    $self
-}
-
-=head2 par()
+=head2 par
 
     my $logical = $par->par;
 
 Returns the logical (input) text corresponding to this paragraph.
 
-=head2 dir()
+=head2 dir
 
     my $dir = $par->dir;
 
 Returns the direction of this paragraph, a constant in the 
-C<$Text::Bidi::Par::> package.
+C<$Text::Bidi::Par::> namespace.
 
-=head2 len()
+=head2 len
 
     my $len = $par->len;
 
 The length of this paragraph.
 
-=head2 types()
+=head2 types
 
     my $types = $par->types;
 
 The Bidi types of the characters in this paragraph. Each element of 
-C<@$types> is a constant in the C<$Text::Bidi::Type::> package.
+C<@$types> is a constant in the C<$Text::Bidi::Type::> namespace.
 
-=head2 levels()
+=head2 levels
 
     my $levels = $par->levels;
 
 The embedding levels for this paragraph. Each element of C<@$levels> is an 
 integer.
 
-=cut
+=head2 bd
 
-for my $f ( qw(par bd dir _par _mirpar)) {
-    no strict 'refs';
-    *$f = sub { $_[0]->{$f} };
-}
+    my $bd = $par->bd;
 
-for my $f ( qw(len unicode types levels mirrored map) ) {
-    no strict 'refs';
-    *$f = sub { $_[0]->{"_$f"} };
-}
+The L<Text::Bidi> object used to interface with libfribidi.
 
-=head2 is_rtl()
+=head2 map
+
+    my $map = $par->map;
+
+The map from the logical text to the visual, i.e., the values in C<$map> are 
+indices in the logical string, so that the C<$i>-th character of the visual 
+string is the character that occurs at C<$map-E<gt>[$i]> in the logical 
+string.
+
+This is updated on each call to L</visual>, so that the map for the full 
+paragraph is correct only after calling L</visual> for the whole text.
+
+=head2 is_rtl
 
     my $rtl = $par->is_rtl;
 
 Returns true if the direction of the paragraph is C<RTL> (right to left).
 
-=cut
-
-sub is_rtl { $_[0]->dir == $Text::Bidi::Par::RTL }
-
-sub init {
-    my ($self) = (@_);
-    my $par = $self->par;
-    $self->{'_len'} = length($par);
-    my $bd = $self->bd;
-    $self->{'_unicode'} = $bd->utf8_to_internal($par);
-    #$self->{'_par'} = [split '', $par];
-    $self->{'_types'} = $bd->get_bidi_types($self->unicode);
-    (my $d, $self->{'_levels'}) =
-        $bd->get_par_embedding_levels($self->types, $self->dir);
-    $self->{'dir'} //= $d;
-    $self->{'_map'} = [0..$#{$self->unicode}];
-    $self->{'_mirrored'} = $bd->mirrored($self->levels, $self->unicode);
-    $self->{'_mirpar'} = $bd->internal_to_utf8($self->mirrored);
-    $self->{'_par'} = [split '', $self->_mirpar ];
-}
-
-=head2 visual()
+=head2 visual
 
     my $visual = $par->visual($offset, $length, $flags);
 
@@ -184,43 +228,19 @@ at which the line should be broken. Hence, if this key is given, the actual
 length is potentially reduced, so that the line breaks at the given string 
 (if possible). A typical value for I<break> is C<' '>.
 
-=cut
-
-sub visual {
-    my ($self, $off, $len, $flags) = @_;
-    $off //= 0;
-    $len //= $self->len;
-    my $mlen = $self->len - $off;
-    $mlen = $len if $len < $mlen;
-    if (my $break = eval { $flags->{'break'} } ) {
-        my $lb = length($break);
-        my $nlen = rindex($self->par, $break, $off + $mlen - $lb) - $off + $lb;
-        $mlen = $nlen if $nlen > 0;
-    }
-    my $bd = $self->bd;
-    (my $levels, $self->{'_map'}) = 
-      $bd->reorder_map($self->types, $off, $mlen, $self->dir, 
-                       $self->map, $self->levels, $flags);
-    $self->{'_levels'} = $bd->tie_byte($levels);
-    $bd->reorder($self->_par, $self->map, $off, $mlen)
-}
-
-1;
-
-__END__
-
 =head1 SEE ALSO
 
 L<Text::Bidi>
 
 =head1 AUTHOR
 
-Moshe Kamensky  (E<lt>kamensky@cpan.orgE<gt>) - Copyright (c) 2013
+Moshe Kamensky <kamensky@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This program is free software. You may copy or 
-redistribute it under the same terms as Perl itself.
+This software is copyright (c) 2013 by Moshe Kamensky.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

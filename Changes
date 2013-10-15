@@ -1,5 +1,21 @@
 Revision history for Text-Bidi
-2.0 2   12.09.2013
+2.06      2013-10-15 23:28:06 Asia/Jerusalem
+
+        * Made log2vis() more useful
+        * Bug fixes
+        * Added some tests
+        * Improved docs
+2.05      2013-09-23 11:56:35 Asia/Jerusalem
+        * Added a README.mkdn file
+        
+2.04      2013-09-23 11:46:51 Asia/Jerusalem
+        * The Fribidi constants are now loaded via a separate module, 
+          Text::Bidi::Constants
+        * Switching to Dist::Zilla
+
+2.03      2013-09-20 12:09:39 Asia/Jerusalem
+        * More changes to Makefile.PL
+2.02    12.09.2013
         Fixed Makefile.PL
         
 2.01    11.09.2013

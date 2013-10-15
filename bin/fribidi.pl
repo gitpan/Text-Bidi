@@ -1,12 +1,12 @@
 #!/usr/bin/env perl
 
-# $Id$
+# PODNAME: fribidi.pl
+# ABSTRACT: Convert logical text to visual, via the unicode bidi algorithm
 
 use 5.10.0;
 use warnings;
 use integer;
-use IPC::System::Simple qw(system);
-use autodie qw(:all);
+use strict;
 
 use open ':encoding(utf8)';
 use open ':std';
@@ -18,34 +18,37 @@ GetOptions(\%Opts, qw(break:s rtl! ltr! levels! width=i));
 
 $Opts{'break'} = ' ' if defined($Opts{'break'}) and ($Opts{'break'} eq '');
 
-use Text::Bidi::Paragraph;
+use Text::Bidi;
+use Text::Bidi::Constants;
 #use Carp::Always;
 
-# read paragraphs
-$/ = '';
-my $flags = { break => $Opts{'break'} } if defined $Opts{'break'};
+# read paragraphs (and make perlcritic happy with 'local')
+local $/ = '';
+my $flags;
+$flags = { break => $Opts{'break'} } if defined $Opts{'break'};
 my $dir = $Opts{'rtl'} ? $Text::Bidi::Par::RTL 
                        : $Opts{'ltr'} ? $Text::Bidi::Par::LTR : undef;
 while (<>) {
     s/ *\n */ /g;
-    my $p = new Text::Bidi::Paragraph $_, dir => $dir;
-    my $offset = 0;
-    while ( $offset < $p->len ) {
-        my $v = $p->visual($offset, $width, $flags);
-        my $l = length($v);
-        $v = (' ' x ($width-$l)) . $v if $p->is_rtl;
-        say $v;
-        $offset += $l;
-    }
+    my ($p, $visual) = log2vis($_, $width, $dir, $flags);
+    say $visual;
     say join(' ', @{$p->levels}) if $Opts{'levels'};
     say '';
 }
 
 # start of POD
 
+__END__
+
+=pod
+
 =head1 NAME
 
 fribidi.pl - Convert logical text to visual, via the unicode bidi algorithm
+
+=head1 VERSION
+
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -55,6 +58,12 @@ fribidi.pl - Convert logical text to visual, via the unicode bidi algorithm
     fribidi.pl --rtl foo.txt
     # same, but break lines on spaces
     fribidi.pl --rtl --break -- foo.txt
+
+=head1 DESCRIPTION
+
+This script is similar to the fribidi(1) program provided with libfribidi, 
+and performs a subset of its functions. The main point is to test 
+L<Text::Bidi> and provide a usage example.
 
 =head1 OPTIONS
 
@@ -101,24 +110,19 @@ Print a line with the program name and exit with status 0
 Any argument is interpreted as a file name, and the content of all the files, 
 as well as the standard input are concatenated together.
 
-=head1 DESCRIPTION
-
-This script is similar to the fribidi(1) program provided with libfribidi, 
-and performs a subset of its functions. The main point is to test 
-L<Text::Bidi> and provide a usage example.
-
 =head1 SEE ALSO
 
 L<Text::Bidi>, L<Text::Bidi::Paragraph>, fribidi(1)
 
 =head1 AUTHOR
 
-Moshe Kamensky  (E<lt>kamensky@cpan.org<gt>) - Copyright (c) 2013
+Moshe Kamensky <kamensky@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This program is free software. You may copy or 
-redistribute it under the same terms as Perl itself.
+This software is copyright (c) 2013 by Moshe Kamensky.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
