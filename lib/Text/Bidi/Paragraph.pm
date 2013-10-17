@@ -1,5 +1,5 @@
 # Created: Tue 27 Aug 2013 04:10:03 PM IDT
-# Last Changed: Tue 15 Oct 2013 01:10:47 PM IDT
+# Last Changed: Thu 17 Oct 2013 10:29:42 AM IDT
 
 use 5.10.0;
 use warnings;
@@ -9,7 +9,7 @@ use strict;
 
 package Text::Bidi::Paragraph;
 {
-  $Text::Bidi::Paragraph::VERSION = '2.06';
+  $Text::Bidi::Paragraph::VERSION = '2.07';
 }
 # ABSTRACT: Run the bidi algorithm on one paragraph
 
@@ -25,8 +25,7 @@ sub new {
     $self->{'bd'} = Text::Bidi::S(@bd);
     $self->{'par'} = $par;
     bless $self => $class;
-    $self->_init;
-    $self
+    $self->_init
 }
 
 
@@ -38,6 +37,13 @@ for my $f ( qw(par bd dir _par _mirpar _unicode _mirrored )) {
 for my $f ( qw(len types levels map) ) {
     no strict 'refs';
     *$f = sub { $_[0]->{"_$f"} };
+}
+
+
+sub type_names {
+    my $self = shift;
+    my $bd = $self->bd;
+    map { $bd->get_bidi_type_name($_) } @{$self->types}
 }
 
 
@@ -57,6 +63,7 @@ sub _init {
     $self->{'_mirrored'} = $bd->mirrored($self->levels, $self->_unicode);
     $self->{'_mirpar'} = $bd->internal_to_utf8($self->_mirrored);
     $self->{'_par'} = [split '', $self->_mirpar ];
+    $self
 }
 
 
@@ -91,7 +98,7 @@ Text::Bidi::Paragraph - Run the bidi algorithm on one paragraph
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 
@@ -188,6 +195,12 @@ string.
 
 This is updated on each call to L</visual>, so that the map for the full 
 paragraph is correct only after calling L</visual> for the whole text.
+
+=head2 type_names
+
+    @types = $par->type_names;
+
+Returns the list of bidi types as strings
 
 =head2 is_rtl
 

@@ -11,16 +11,21 @@ use strict;
 use open ':encoding(utf8)';
 use open ':std';
 
-use Getopt::Long qw(:config gnu_getopt auto_help auto_version);
-our $width = $ENV{'COLUMNS'} // 80;
-our %Opts = ('width=i' => \$width);
-GetOptions(\%Opts, qw(break:s rtl! ltr! levels! width=i));
-
-$Opts{'break'} = ' ' if defined($Opts{'break'}) and ($Opts{'break'} eq '');
-
-use Text::Bidi;
+use Text::Bidi 2.07 qw(log2vis get_bidi_type_name fribidi_version);
 use Text::Bidi::Constants;
 #use Carp::Always;
+
+use Getopt::Long qw(:config gnu_getopt auto_help auto_version);
+our $VERSION = "2.07\nlibfribidi " . fribidi_version;
+our $width = $ENV{'COLUMNS'} // 80;
+our %Opts = ('width=i' => \$width);
+GetOptions(\%Opts, qw(break:s rtl! ltr! levels! hex! dir! ltov! types! verbose! width=i));
+
+$Opts{'break'} = ' ' if defined($Opts{'break'}) and ($Opts{'break'} eq '');
+if ($Opts{'verbose'}) {
+    $Opts{$_} = 1 foreach (qw(levels dir ltov types hex));
+}
+
 
 # read paragraphs (and make perlcritic happy with 'local')
 local $/ = '';
@@ -29,11 +34,15 @@ $flags = { break => $Opts{'break'} } if defined $Opts{'break'};
 my $dir = $Opts{'rtl'} ? $Text::Bidi::Par::RTL 
                        : $Opts{'ltr'} ? $Text::Bidi::Par::LTR : undef;
 while (<>) {
+    chomp;
     s/ *\n */ /g;
     my ($p, $visual) = log2vis($_, $width, $dir, $flags);
     say $visual;
-    say join(' ', @{$p->levels}) if $Opts{'levels'};
     say '';
+    say STDERR "Base dir: " . get_bidi_type_name($p->dir) if $Opts{'dir'};
+    say STDERR "Hex: " . join(' ', map { sprintf("%x", ord($_)) } split '');
+    say STDERR "Types: " . join(' ', $p->type_names) if $Opts{'types'};
+    say STDERR "Levels: " . join(' ', @{$p->levels}) if $Opts{'levels'};
 }
 
 # start of POD
@@ -48,7 +57,7 @@ fribidi.pl - Convert logical text to visual, via the unicode bidi algorithm
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

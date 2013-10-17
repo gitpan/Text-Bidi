@@ -8,7 +8,7 @@ use strict;
 
 package Text::Bidi::Array::Byte;
 {
-  $Text::Bidi::Array::Byte::VERSION = '2.06';
+  $Text::Bidi::Array::Byte::VERSION = '2.07';
 }
 # ABSTRACT: Dual-life byte arrays
 
@@ -58,7 +58,7 @@ Text::Bidi::Array::Byte - Dual-life byte arrays
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

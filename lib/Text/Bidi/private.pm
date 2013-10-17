@@ -6,13 +6,13 @@
 
 package Text::Bidi::private;
 {
-  $Text::Bidi::private::VERSION = '2.06';
+  $Text::Bidi::private::VERSION = '2.07';
 }
 use base qw(Exporter);
 use base qw(DynaLoader);
 package Text::Bidi::privatec;
 {
-  $Text::Bidi::privatec::VERSION = '2.06';
+  $Text::Bidi::privatec::VERSION = '2.07';
 }
 bootstrap Text::Bidi::private;
 package Text::Bidi::private;
@@ -190,6 +190,7 @@ package Text::Bidi::private;
 *FRIBIDI_JOINING_TYPE_T_VAL = *Text::Bidi::privatec::FRIBIDI_JOINING_TYPE_T_VAL;
 *FRIBIDI_JOINING_TYPE_G_VAL = *Text::Bidi::privatec::FRIBIDI_JOINING_TYPE_G_VAL;
 *_FRIBIDI_JOINING_TYPE_JUNK = *Text::Bidi::privatec::_FRIBIDI_JOINING_TYPE_JUNK;
+*version_info = *Text::Bidi::privatec::version_info;
 1;
 
 __END__
@@ -202,7 +203,7 @@ Text::Bidi::private
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

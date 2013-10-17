@@ -5,7 +5,7 @@ use strict 'vars';
 
 package Text::Bidi;
 {
-  $Text::Bidi::VERSION = '2.06';
+  $Text::Bidi::VERSION = '2.07';
 }
 # ABSTRACT: Unicode bidi algorithm using libfribidi
 
@@ -25,6 +25,9 @@ BEGIN {
             log2vis
             is_bidi
             get_mirror_char
+            get_bidi_type_name
+            fribidi_version
+            unicode_version
         ) ],
     );
     our @EXPORT_OK = ( @{$EXPORT_TAGS{'all'}} );
@@ -210,6 +213,16 @@ sub get_mirror_char {
 }
 
 
+sub fribidi_version {
+    $Text::Bidi::private::version_info
+}
+
+
+sub unicode_version {
+    $Text::Bidi::private::unicode_version
+}
+
+
 1; # End of Text::Bidi
 
 __END__
@@ -222,7 +235,7 @@ Text::Bidi - Unicode bidi algorithm using libfribidi
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 
@@ -256,6 +269,18 @@ L</is_bidi>
 =item *
 
 L</get_mirror_char>
+
+=item *
+
+L</get_bidi_type_name>
+
+=item *
+
+L</fribidi_version>
+
+=item *
+
+L</unicode_version>
 
 =back
 
@@ -317,6 +342,14 @@ L</SUBCLASSING>.
 
 =head1 FUNCTIONS
 
+=head2 get_bidi_type_name
+
+    say $tb->get_bidi_type_name($Text::Bidi::Type::LTR); # says 'LTR'
+
+Return the string representation of a Bidi character type, as in 
+fribidi_get_bidi_type_name(3). Note that for the above example, one needs to 
+use L<Text::Bidi::Constants>.
+
 =head2 log2vis
 
     ($p, $visual) = log2vis($logical[,$width[,$dir[,$flags]]]);
@@ -345,6 +378,18 @@ helps if we want to short-circuit.
     my $mir = get_mirror_char('['); # $mir == ']'
 
 Return the mirror character of the input, possibly itself.
+
+=head2 fribidi_version
+
+    say fribidi_version();
+
+Returns the version information for the fribidi library
+
+=head2 unicode_version
+
+    say unicode_version();
+
+Returns the Unicode version used by the fribidi library
 
 =head1 SUBCLASSING
 
@@ -394,14 +439,6 @@ L<Text::Bidi::Array::Long>, or anything that can be used to construct it.
 Returns a L<Text::Bidi::Array::Long> with the list of Bidi types of the text 
 given by $internal, a representation of the paragraph text, as returned by 
 utf8_to_internal(). Wraps fribidi_get_bidi_types(3).
-
-=head2 get_bidi_type_name
-
-    say $tb->get_bidi_type_name($Text::Bidi::Type::LTR); # says 'LTR'
-
-Return the string representation of a Bidi character type, as in 
-fribidi_get_bidi_type_name(3). Note that for the above example, one needs to 
-use L<Text::Bidi::Constants>.
 
 =head2 get_joining_types
 

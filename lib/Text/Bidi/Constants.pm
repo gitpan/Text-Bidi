@@ -4,7 +4,7 @@ use integer;
 use strict 'vars';
 package Text::Bidi::Constants;
 {
-  $Text::Bidi::Constants::VERSION = '2.06';
+  $Text::Bidi::Constants::VERSION = '2.07';
 }
 # ABSTRACT: Constants for Text::Bidi
 
@@ -16,7 +16,7 @@ SYM: for my $sym ( keys %Text::Bidi::private:: ) {
 
     for my $kind ( qw(Type Mask Par Flag) ) {
         if ( $sym =~ /FRIBIDI_\U${kind}\E_([A-Z_]*)$/ ) {
-            *{"Text::Bidi::$kind::$1"} = *{"Text::Bidi::private::$sym"};
+            *{"Text::Bidi::${kind}::$1"} = *{"Text::Bidi::private::$sym"};
             next SYM;
         }
     }
@@ -48,7 +48,7 @@ Text::Bidi::Constants - Constants for Text::Bidi
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

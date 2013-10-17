@@ -32,48 +32,48 @@ EOF
 }
 
 my %WriteMakefileArgs = (
-                       'VERSION' => '2.06',
+                       'LICENSE' => 'perl',
+                       'VERSION' => '2.07',
+                       'MIN_PERL_VERSION' => '5.010000',
                        'test' => {
                                    'TESTS' => 't/*.t'
                                  },
-                       'MIN_PERL_VERSION' => '5.010000',
+                       'PREREQ_PM' => {
+                                        'open' => '0',
+                                        'base' => '0',
+                                        'warnings' => '0',
+                                        'Carp' => '0',
+                                        'Getopt::Long' => '0',
+                                        'overload' => '0',
+                                        'Tie::Array' => '0',
+                                        'strict' => '0',
+                                        'integer' => '0',
+                                        'DynaLoader' => '0',
+                                        'Encode' => '0',
+                                        'Exporter' => '0'
+                                      },
                        'DISTNAME' => 'Text-Bidi',
-                       'LICENSE' => 'perl',
-                       'BUILD_REQUIRES' => {},
-                       'CONFIGURE_REQUIRES' => {
-                                                 'ExtUtils::MakeMaker' => '6.30'
-                                               },
                        'ABSTRACT' => 'Unicode bidi algorithm using libfribidi',
+                       'BUILD_REQUIRES' => {},
                        'EXE_FILES' => [
                                         'bin/fribidi.pl'
                                       ],
-                       'NAME' => 'Text::Bidi::private',
-                       'PREREQ_PM' => {
-                                        'DynaLoader' => '0',
-                                        'Tie::Array' => '0',
-                                        'strict' => '0',
-                                        'Exporter' => '0',
-                                        'overload' => '0',
-                                        'open' => '0',
-                                        'base' => '0',
-                                        'Carp' => '0',
-                                        'Getopt::Long' => '0',
-                                        'integer' => '0',
-                                        'warnings' => '0',
-                                        'Encode' => '0'
-                                      },
                        'TEST_REQUIRES' => {
                                             'File::Find' => '0',
-                                            'charnames' => '0',
                                             'File::Temp' => '0',
                                             'File::Spec::Functions' => '0',
-                                            'Test::More' => '0',
                                             'List::Util' => '0',
                                             'ExtUtils::MakeMaker' => '0',
+                                            'Test::More' => '0',
                                             'utf8' => '0',
-                                            'Data::Dumper' => '0'
+                                            'Data::Dumper' => '0',
+                                            'charnames' => '0'
                                           },
-                       'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>'
+                       'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>',
+                       'NAME' => 'Text::Bidi::private',
+                       'CONFIGURE_REQUIRES' => {
+                                                 'ExtUtils::MakeMaker' => '6.30'
+                                               }
                      );
 
 

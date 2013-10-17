@@ -21,6 +21,7 @@ private.c
 swig/fribidi.i
 t/00-compile.t
 t/00-report-prereqs.t
+t/00-version.t
 t/BidiTest.txt
 t/known.txt
 t/simple.t

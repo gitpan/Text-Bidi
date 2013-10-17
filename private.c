@@ -1901,6 +1901,9 @@ FriBidiLevel reorder_map (const FriBidiFlags flags,
       flags, bd_types, length, off, base_dir, emb_levels, NULL, map);
 }
 
+extern const char *fribidi_version_info;
+
+
 
 
 
@@ -1942,6 +1945,32 @@ fail:
 SWIGCLASS_STATIC int _wrap_unicode_version_get(pTHX_ SV *sv, MAGIC *SWIGUNUSEDPARM(mg)) {
   MAGIC_PPERL
   sv_setsv(sv,SWIG_FromCharPtr(fribidi_unicode_version))  ;
+  return 1;
+}
+
+
+SWIGCLASS_STATIC int _wrap_version_info_set(pTHX_ SV* sv, MAGIC * SWIGUNUSEDPARM(mg)) {
+  MAGIC_PPERL
+  {
+    char *cptr = 0; size_t csize = 0; int alloc = SWIG_NEWOBJ;
+    int res = SWIG_AsCharPtrAndSize(sv, &cptr, &csize, &alloc);
+    if (!SWIG_IsOK(res)) {
+      SWIG_exception_fail(SWIG_ArgError(res), "in variable '""fribidi_version_info""' of type '""char const *""'");
+    }
+    if (alloc == SWIG_NEWOBJ) {
+      fribidi_version_info = cptr;
+    } else {
+      fribidi_version_info = csize ? (char const *)(char *)memcpy((char *)malloc((csize)*sizeof(char)), cptr, sizeof(char)*(csize)) : 0;
+    }
+  }
+fail:
+  return 1;
+}
+
+
+SWIGCLASS_STATIC int _wrap_version_info_get(pTHX_ SV *sv, MAGIC *SWIGUNUSEDPARM(mg)) {
+  MAGIC_PPERL
+  sv_setsv(sv,SWIG_FromCharPtr(fribidi_version_info))  ;
   return 1;
 }
 
@@ -2763,6 +2792,7 @@ static swig_constant_info swig_constants[] = {
 #endif
 static swig_variable_info swig_variables[] = {
     { "Text::Bidi::privatec::unicode_version", MAGIC_CLASS _wrap_unicode_version_set, MAGIC_CLASS _wrap_unicode_version_get,0 },
+    { "Text::Bidi::privatec::version_info", MAGIC_CLASS _wrap_version_info_set, MAGIC_CLASS _wrap_version_info_get,0 },
 {0,0,0,0}
 };
 static swig_command_info swig_commands[] = {
