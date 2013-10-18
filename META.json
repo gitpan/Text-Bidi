@@ -64,34 +64,35 @@
             "List::Util" : "0",
             "Test::More" : "0",
             "charnames" : "0",
-            "utf8" : "0"
+            "utf8" : "0",
+            "version" : "0.77"
          }
       }
    },
    "provides" : {
       "Text::Bidi" : {
          "file" : "lib/Text/Bidi.pm",
-         "version" : "2.07"
+         "version" : "2.08"
       },
       "Text::Bidi::Array" : {
          "file" : "lib/Text/Bidi/Array.pm",
-         "version" : "2.07"
+         "version" : "2.08"
       },
       "Text::Bidi::Array::Byte" : {
          "file" : "lib/Text/Bidi/Array/Byte.pm",
-         "version" : "2.07"
+         "version" : "2.08"
       },
       "Text::Bidi::Array::Long" : {
          "file" : "lib/Text/Bidi/Array/Long.pm",
-         "version" : "2.07"
+         "version" : "2.08"
       },
       "Text::Bidi::Constants" : {
          "file" : "lib/Text/Bidi/Constants.pm",
-         "version" : "2.07"
+         "version" : "2.08"
       },
       "Text::Bidi::Paragraph" : {
          "file" : "lib/Text/Bidi/Paragraph.pm",
-         "version" : "2.07"
+         "version" : "2.08"
       }
    },
    "release_status" : "stable",
@@ -107,6 +108,6 @@
          "web" : "https://github.com/mkamensky/Text-Bidi"
       }
    },
-   "version" : "2.07"
+   "version" : "2.08"
 }
 

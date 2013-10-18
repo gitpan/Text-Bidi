@@ -4,7 +4,7 @@ use integer;
 use strict 'vars';
 package Text::Bidi::Constants;
 {
-  $Text::Bidi::Constants::VERSION = '2.07';
+  $Text::Bidi::Constants::VERSION = '2.08';
 }
 # ABSTRACT: Constants for Text::Bidi
 
@@ -48,7 +48,7 @@ Text::Bidi::Constants - Constants for Text::Bidi
 
 =head1 VERSION
 
-version 2.07
+version 2.08
 
 =head1 DESCRIPTION
 

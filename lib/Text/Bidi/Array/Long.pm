@@ -8,7 +8,7 @@ use strict;
 
 package Text::Bidi::Array::Long;
 {
-  $Text::Bidi::Array::Long::VERSION = '2.07';
+  $Text::Bidi::Array::Long::VERSION = '2.08';
 }
 # ABSTRACT: Dual-life long arrays
 
@@ -74,7 +74,7 @@ Text::Bidi::Array::Long - Dual-life long arrays
 
 =head1 VERSION
 
-version 2.07
+version 2.08
 
 =head1 SYNOPSIS
 

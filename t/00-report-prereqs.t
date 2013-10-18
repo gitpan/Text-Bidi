@@ -31,6 +31,7 @@ my @modules = qw(
   perl
   strict
   utf8
+  version
   warnings
 );
 

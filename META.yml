@@ -12,6 +12,7 @@ build_requires:
   Test::More: 0
   charnames: 0
   utf8: 0
+  version: 0.77
 configure_requires:
   ExtUtils::MakeMaker: 6.30
 dynamic_config: 0
@@ -33,22 +34,22 @@ no_index:
 provides:
   Text::Bidi:
     file: lib/Text/Bidi.pm
-    version: 2.07
+    version: 2.08
   Text::Bidi::Array:
     file: lib/Text/Bidi/Array.pm
-    version: 2.07
+    version: 2.08
   Text::Bidi::Array::Byte:
     file: lib/Text/Bidi/Array/Byte.pm
-    version: 2.07
+    version: 2.08
   Text::Bidi::Array::Long:
     file: lib/Text/Bidi/Array/Long.pm
-    version: 2.07
+    version: 2.08
   Text::Bidi::Constants:
     file: lib/Text/Bidi/Constants.pm
-    version: 2.07
+    version: 2.08
   Text::Bidi::Paragraph:
     file: lib/Text/Bidi/Paragraph.pm
-    version: 2.07
+    version: 2.08
 requires:
   Carp: 0
   DynaLoader: 0
@@ -67,4 +68,4 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Bidi
   homepage: https://github.com/mkamensky/Text-Bidi
   repository: https://github.com/mkamensky/Text-Bidi.git
-version: 2.07
+version: 2.08

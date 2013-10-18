@@ -22,6 +22,7 @@ on 'test' => sub {
   requires "Test::More" => "0";
   requires "charnames" => "0";
   requires "utf8" => "0";
+  requires "version" => "0.77";
 };
 
 on 'configure' => sub {

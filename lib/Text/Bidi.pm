@@ -5,7 +5,7 @@ use strict 'vars';
 
 package Text::Bidi;
 {
-  $Text::Bidi::VERSION = '2.07';
+  $Text::Bidi::VERSION = '2.08';
 }
 # ABSTRACT: Unicode bidi algorithm using libfribidi
 
@@ -27,6 +27,7 @@ BEGIN {
             get_mirror_char
             get_bidi_type_name
             fribidi_version
+            fribidi_version_num
             unicode_version
         ) ],
     );
@@ -218,6 +219,11 @@ sub fribidi_version {
 }
 
 
+sub fribidi_version_num {
+    fribidi_version =~ /\(GNU FriBidi\) ([0-9.]*)/ ? $1 : ()
+}
+
+
 sub unicode_version {
     $Text::Bidi::private::unicode_version
 }
@@ -235,7 +241,7 @@ Text::Bidi - Unicode bidi algorithm using libfribidi
 
 =head1 VERSION
 
-version 2.07
+version 2.08
 
 =head1 SYNOPSIS
 
@@ -281,6 +287,10 @@ L</fribidi_version>
 =item *
 
 L</unicode_version>
+
+=item *
+
+L</fribidi_version_num>
 
 =back
 
@@ -384,6 +394,12 @@ Return the mirror character of the input, possibly itself.
     say fribidi_version();
 
 Returns the version information for the fribidi library
+
+=head2 fribidi_version_num
+
+    say fribidi_version_num();
+
+Returns the version number for the fribidi library
 
 =head2 unicode_version
 

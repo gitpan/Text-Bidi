@@ -6,13 +6,13 @@
 
 package Text::Bidi::private;
 {
-  $Text::Bidi::private::VERSION = '2.07';
+  $Text::Bidi::private::VERSION = '2.08';
 }
 use base qw(Exporter);
 use base qw(DynaLoader);
 package Text::Bidi::privatec;
 {
-  $Text::Bidi::privatec::VERSION = '2.07';
+  $Text::Bidi::privatec::VERSION = '2.08';
 }
 bootstrap Text::Bidi::private;
 package Text::Bidi::private;
@@ -203,7 +203,7 @@ Text::Bidi::private
 
 =head1 VERSION
 
-version 2.07
+version 2.08
 
 =head1 AUTHOR
 
