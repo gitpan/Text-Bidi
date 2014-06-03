@@ -17,13 +17,14 @@ if ( %fribidi ) {
     $cflags = $fribidi{'cflags'};
 } else {
     unless ( -r '/usr/include/fribidi/fribidi.h' ) {
-        die <<'EOF'
+        warn <<'EOF';
 
 It seems that fribidi is missing. 
 
 fribidi should be installed prior to the installation of this module.
 
 EOF
+        exit 0;
 
     }
     warn "Using heuristic values for CFLAGS and LIBS\n";
@@ -32,49 +33,51 @@ EOF
 }
 
 my %WriteMakefileArgs = (
-                       'BUILD_REQUIRES' => {},
-                       'NAME' => 'Text::Bidi::private',
-                       'DISTNAME' => 'Text-Bidi',
-                       'PREREQ_PM' => {
-                                        'base' => '0',
-                                        'open' => '0',
-                                        'overload' => '0',
-                                        'strict' => '0',
-                                        'warnings' => '0',
-                                        'Carp' => '0',
-                                        'integer' => '0',
-                                        'Tie::Array' => '0',
-                                        'Getopt::Long' => '0',
-                                        'DynaLoader' => '0',
-                                        'Encode' => '0',
-                                        'Exporter' => '0'
-                                      },
-                       'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>',
-                       'EXE_FILES' => [
-                                        'bin/fribidi.pl'
-                                      ],
-                       'VERSION' => '2.08',
+                       'MIN_PERL_VERSION' => '5.010000',
                        'CONFIGURE_REQUIRES' => {
                                                  'ExtUtils::MakeMaker' => '6.30'
                                                },
                        'LICENSE' => 'perl',
-                       'TEST_REQUIRES' => {
-                                            'ExtUtils::MakeMaker' => '0',
-                                            'File::Temp' => '0',
-                                            'Test::More' => '0',
-                                            'charnames' => '0',
-                                            'Data::Dumper' => '0',
-                                            'utf8' => '0',
-                                            'version' => '0.77',
-                                            'List::Util' => '0',
-                                            'File::Spec::Functions' => '0',
-                                            'File::Find' => '0'
-                                          },
-                       'ABSTRACT' => 'Unicode bidi algorithm using libfribidi',
+                       'DISTNAME' => 'Text-Bidi',
                        'test' => {
                                    'TESTS' => 't/*.t'
                                  },
-                       'MIN_PERL_VERSION' => '5.010000'
+                       'NAME' => 'Text::Bidi::private',
+                       'TEST_REQUIRES' => {
+                                            'List::Util' => '0',
+                                            'Test::More' => '0',
+                                            'ExtUtils::MakeMaker' => '0',
+                                            'File::Spec' => '0',
+                                            'IO::Handle' => '0',
+                                            'Data::Dumper' => '0',
+                                            'charnames' => '0',
+                                            'File::Spec::Functions' => '0',
+                                            'version' => '0.77',
+                                            'utf8' => '0',
+                                            'File::Temp' => '0',
+                                            'IPC::Open3' => '0'
+                                          },
+                       'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>',
+                       'BUILD_REQUIRES' => {},
+                       'EXE_FILES' => [
+                                        'bin/fribidi.pl'
+                                      ],
+                       'PREREQ_PM' => {
+                                        'DynaLoader' => '0',
+                                        'Tie::Array' => '0',
+                                        'warnings' => '0',
+                                        'base' => '0',
+                                        'open' => '0',
+                                        'Carp' => '0',
+                                        'strict' => '0',
+                                        'Exporter' => '0',
+                                        'Getopt::Long' => '0',
+                                        'overload' => '0',
+                                        'Encode' => '0',
+                                        'integer' => '0'
+                                      },
+                       'VERSION' => '2.09',
+                       'ABSTRACT' => 'Unicode bidi algorithm using libfribidi'
                      );
 
 

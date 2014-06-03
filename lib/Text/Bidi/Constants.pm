@@ -3,11 +3,8 @@ use warnings;
 use integer;
 use strict 'vars';
 package Text::Bidi::Constants;
-{
-  $Text::Bidi::Constants::VERSION = '2.08';
-}
 # ABSTRACT: Constants for Text::Bidi
-
+$Text::Bidi::Constants::VERSION = '2.09';
 
 use Text::Bidi::private;
 SYM: for my $sym ( keys %Text::Bidi::private:: ) {
@@ -48,7 +45,7 @@ Text::Bidi::Constants - Constants for Text::Bidi
 
 =head1 VERSION
 
-version 2.08
+version 2.09
 
 =head1 DESCRIPTION
 

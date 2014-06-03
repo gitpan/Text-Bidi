@@ -16,10 +16,12 @@ my @modules = qw(
   Encode
   Exporter
   ExtUtils::MakeMaker
-  File::Find
+  File::Spec
   File::Spec::Functions
   File::Temp
   Getopt::Long
+  IO::Handle
+  IPC::Open3
   List::Util
   Test::More
   Tie::Array

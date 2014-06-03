@@ -4,11 +4,8 @@ use warnings;
 use strict 'vars';
 
 package Text::Bidi;
-{
-  $Text::Bidi::VERSION = '2.08';
-}
 # ABSTRACT: Unicode bidi algorithm using libfribidi
-
+$Text::Bidi::VERSION = '2.09';
 use Exporter;
 use base qw(Exporter);
 use Carp;
@@ -241,7 +238,7 @@ Text::Bidi - Unicode bidi algorithm using libfribidi
 
 =head1 VERSION
 
-version 2.08
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -254,7 +251,7 @@ version 2.08
     # For real paragraphs, need to specify the display width
     ($par, $map, $visual) = log2vis($logical, $width);
 
-    # object oriented approach allows to display line by line
+    # object oriented approach allows one to display line by line
     $p = new Text::Bidi::Paragraph $logical;
     $visual = $p->visual($off, $len);
 
